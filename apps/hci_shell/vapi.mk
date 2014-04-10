@@ -1,1 +1,1 @@
-LIBRARY_NAME=hciplus_hci_shell
+LIBRARY_NAME=shotodol_hci_shell

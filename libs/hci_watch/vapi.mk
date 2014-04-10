@@ -1,1 +1,1 @@
-LIBRARY_NAME=hciplus_hci_watch
+LIBRARY_NAME=shotodol_hci_watch
