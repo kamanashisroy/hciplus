@@ -1,0 +1,1 @@
+LIBRARY_NAME=hciplus_hci_watch
