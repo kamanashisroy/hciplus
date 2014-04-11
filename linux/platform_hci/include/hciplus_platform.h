@@ -13,10 +13,14 @@ typedef struct {
 	int err_cnt;
 } hci_dev_t;
 
-#define hci_dev_open(x) ({ \
+#define hci_dev_new(x,y) ({ \
 	memset(x, 0, sizeof(hci_dev_t)); \
-	x->hci_fd = -1; \
+	(x)->hci_fd = -1; \
 })
-#define hci_dev_close(x) ({if(x->hci_fd > 0)close(x->hci_fd);x->hci_fd = -1;})
+#define hci_dev_open(x) ({ \
+	/*TODO fill me*/ \
+})
+
+#define hci_dev_close(x) ({if((x)->hci_fd > 0)close((x)->hci_fd);(x)->hci_fd = -1;})
 
 #endif //SHOTODOL_PLUGIN_INCLUDE_H

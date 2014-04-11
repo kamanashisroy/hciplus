@@ -1,3 +1,4 @@
 libs/watchdog
+libs/propeller
 -HCIPLUS_HOME
 OS_PLATFORM/platform_hci

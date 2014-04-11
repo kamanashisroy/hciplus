@@ -4,22 +4,24 @@ using hciplus;
 
 public class hciplus.HCICommand : M100Command {
 	etxt prfx;
+	HCIShell shell;
 	enum Options {
-		INFILE = 1,
-		OUTFILE,
+		UP = 1,
+		DOWN,
 	}
 	public HCICommand() {
 		base();
-		etxt input = etxt.from_static("-i");
-		etxt input_help = etxt.from_static("Input file");
-		etxt output = etxt.from_static("-o");
-		etxt output_help = etxt.from_static("Output file");
-		addOption(&input, M100Command.OptionType.TXT, Options.INFILE, &input_help);
-		addOption(&output, M100Command.OptionType.TXT, Options.OUTFILE, &output_help); 
+		shell = new HCIShell();
+		etxt up = etxt.from_static("-up");
+		etxt up_help = etxt.from_static("Open dev");
+		etxt down = etxt.from_static("-down");
+		etxt down_help = etxt.from_static("Close dev");
+		addOption(&up, M100Command.OptionType.NONE, Options.UP, &up_help);
+		addOption(&down, M100Command.OptionType.NONE, Options.DOWN, &down_help); 
 	}
 
 	public override etxt*get_prefix() {
-		prfx = etxt.from_static("convert");
+		prfx = etxt.from_static("hci");
 		return &prfx;
 	}
 
@@ -30,11 +32,14 @@ public class hciplus.HCICommand : M100Command {
 		parseOptions(cmdstr, &vals);
 		do {
 			container<txt>? mod;
-			if((mod = vals.search(Options.INFILE, match_all)) == null) {
+			if((mod = vals.search(Options.UP, match_all)) != null) {
+				// up
+				shell.up();
 				break;
 			}
-			unowned txt infile = mod.get();
-			if((mod = vals.search(Options.OUTFILE, match_all)) == null) {
+			if((mod = vals.search(Options.DOWN, match_all)) != null) {
+				// down
+				shell.down();
 				break;
 			}
 			bye(pad, true);
