@@ -4,9 +4,13 @@ using hciplus_platform;
 
 public class hciplus.HCIWatch : shotodol.Spindle {
 	HCIDev dev;
+	HCIInputStream hios;
+
 	public HCIWatch(etxt*devName) {
 		dev = HCIDev(devName);
+		hios = new HCIInputStream(&dev);
 	}
+
 	~HCIWatch() {
 		dev.close();
 	}
@@ -28,6 +32,9 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 
 	public override int step() {
 		// see if the is any hci activity ..
+		etxt buf = etxt.stack(512);
+		hios.read(&buf);
+		print("There is something ..\n");
 		return 0;
 	}
 

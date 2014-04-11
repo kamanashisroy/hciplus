@@ -8,10 +8,12 @@ public class hciplus.HCIShell : Replicable {
 	public HCIShell() {
 		etxt hcidev = etxt.from_static("0");
 		hci = new HCIEventBroker(&hcidev);
+		MainTurbine.gearup(hci);
 	}
 
 	~HCIShell() {
 		hci.inactivate();
+		MainTurbine.geardown(hci);
 	}
 
 	public int up() {

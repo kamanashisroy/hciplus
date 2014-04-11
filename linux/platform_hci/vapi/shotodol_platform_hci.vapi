@@ -7,6 +7,8 @@ namespace hciplus_platform {
 		public HCIDev(etxt*devName);
 		[CCode (cname="hci_dev_open", cheader_filename = "hciplus_platform.h")]
 		public int open();
+		[CCode (cname="hci_dev_read", cheader_filename = "hciplus_platform.h")]
+		public int read(etxt*buf);
 		[CCode (cname="hci_dev_close", cheader_filename = "hciplus_platform.h")]
 		public int close();
 	}

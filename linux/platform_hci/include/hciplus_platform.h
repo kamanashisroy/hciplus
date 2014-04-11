@@ -18,9 +18,25 @@ typedef struct {
 	(x)->hci_fd = -1; \
 })
 #define hci_dev_open(x) ({ \
-	/*TODO fill me*/ \
+	(x)->hci_fd = socket(AF_BLUETOOTH, SOCK_RAW/* | SOCK_CLOEXEC | SOCK_NONBLOCK*/, BTPROTO_HCI); \
+	if((x)->hci_fd < 0) { \
+		perror("HCI client socket creation failed"); \
+	} else { \
+		struct sockaddr_hci addr; \ 
+		memset(&addr, 0, sizeof(addr)); \
+		addr.hci_family = AF_BLUETOOTH; \
+		addr.hci_dev = 0; \
+		addr.hci_channel = HCI_CHANNEL_USER; \
+		if(bind((x)->hci_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) { \
+			perror("Could not bind"); \
+		} \
+	} \
+	0; \
 })
 
 #define hci_dev_close(x) ({if((x)->hci_fd > 0)close((x)->hci_fd);(x)->hci_fd = -1;})
+
+#define hci_dev_read(x, y) ({int _rd = read((x)->hci_fd, (y)->str+(y)->len, (y)->size - (y)->len);if(_rd > 0){(y)->len += _rd;}_rd;})
+
 
 #endif //SHOTODOL_PLUGIN_INCLUDE_H

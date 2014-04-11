@@ -20,6 +20,9 @@ public class hciplus.HCICommand : M100Command {
 		addOption(&down, M100Command.OptionType.NONE, Options.DOWN, &down_help); 
 	}
 
+	~HCICommand() {
+	}
+
 	public override etxt*get_prefix() {
 		prfx = etxt.from_static("hci");
 		return &prfx;
