@@ -9,6 +9,12 @@ namespace hciplus_platform {
 		public int open();
 		[CCode (cname="hci_dev_read", cheader_filename = "hciplus_platform.h")]
 		public int read(etxt*buf);
+		[CCode (cname="hci_dev_write", cheader_filename = "hciplus_platform.h")]
+		public int write(etxt*buf);
+		[CCode (cname="hci_dev_write_command", cheader_filename = "hciplus_platform.h")]
+		public int writeCommand(int ogf, int ocf, int plen, void*param);
+		[CCode (cname="hci_dev_platform_info", cheader_filename = "hciplus_platform.h")]
+		public int platformInfo();
 		[CCode (cname="hci_dev_close", cheader_filename = "hciplus_platform.h")]
 		public int close();
 	}

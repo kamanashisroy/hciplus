@@ -3,26 +3,35 @@ using shotodol;
 using hciplus;
 
 public class hciplus.HCIShell : Replicable {
-	HCIEventBroker hci;
+	HCISpokesMan hci;
 
 	public HCIShell() {
 		etxt hcidev = etxt.from_static("0");
-		hci = new HCIEventBroker(&hcidev);
+		hci = new HCISpokesMan(&hcidev);
 		MainTurbine.gearup(hci);
 	}
 
 	~HCIShell() {
-		hci.inactivate();
+		hci.unwatch();
 		MainTurbine.geardown(hci);
 	}
 
 	public int up() {
-		hci.activate();
+		hci.watch();
+		hci.describe("Up ..\n");
 		return 0;
 	}
 
 	public int down() {
-		hci.inactivate();
+		hci.unwatch();
+		hci.describe("Down ..\n");
+		return 0;
+	}
+
+	public int scan() {
+		hci.describe("Scanning ..\n");
+		hci.inquery();
+		hci.describe("Scanning .. ..\n");
 		return 0;
 	}
 }
