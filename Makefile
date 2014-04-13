@@ -11,10 +11,10 @@ cleanapps:
 	$(CLEAN) -C apps/hci_shell
 
 makecore:
-	$(BUILD) -C libs/hci_watch
+	$(BUILD) -C libs/hci_kit
 
 cleancore:
-	$(CLEAN) -C libs/hci_watch
+	$(CLEAN) -C libs/hci_kit
 
 clean:cleancore cleanapps
 

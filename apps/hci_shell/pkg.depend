@@ -2,4 +2,4 @@ libs/iostream
 core/commands
 core/base
 -PROJECT_HOME
-libs/hci_watch
+libs/hci_kit

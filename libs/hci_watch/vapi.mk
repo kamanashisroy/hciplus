@@ -1,1 +1,0 @@
-LIBRARY_NAME=shotodol_hci_watch
