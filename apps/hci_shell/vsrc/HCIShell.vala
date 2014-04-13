@@ -3,11 +3,11 @@ using shotodol;
 using hciplus;
 
 public class hciplus.HCIShell : Replicable {
-	HCISpokesMan hci;
+	HCIScribe hci;
 
 	public HCIShell() {
 		etxt hcidev = etxt.from_static("0");
-		hci = new HCISpokesMan(&hcidev);
+		hci = new HCIScribe(&hcidev);
 		MainTurbine.gearup(hci);
 	}
 
@@ -16,7 +16,8 @@ public class hciplus.HCIShell : Replicable {
 		MainTurbine.geardown(hci);
 	}
 
-	public int up() {
+	public int up(etxt*devid) {
+		hci.setDevId(devid);
 		hci.watch();
 		hci.describe("Up ..\n");
 		return 0;

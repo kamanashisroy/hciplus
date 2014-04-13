@@ -19,7 +19,7 @@ public class hciplus.HCICommand : M100Command {
 		etxt down_help = etxt.from_static("Close dev");
 		etxt scan = etxt.from_static("-scan");
 		etxt scan_help = etxt.from_static("Scan dev");
-		addOption(&up, M100Command.OptionType.NONE, Options.UP, &up_help);
+		addOption(&up, M100Command.OptionType.TXT, Options.UP, &up_help);
 		addOption(&down, M100Command.OptionType.NONE, Options.DOWN, &down_help); 
 		addOption(&scan, M100Command.OptionType.NONE, Options.SCAN, &scan_help); 
 	}
@@ -39,7 +39,7 @@ public class hciplus.HCICommand : M100Command {
 		parseOptions(cmdstr, &vals);
 		do {
 			container<txt>? mod;
-			if((mod = vals.search(Options.UP, match_all)) != null)shell.up();
+			if((mod = vals.search(Options.UP, match_all)) != null)shell.up(mod.get());
 			if((mod = vals.search(Options.DOWN, match_all)) != null)shell.down();
 			if((mod = vals.search(Options.SCAN, match_all)) != null) shell.scan();
 			bye(pad, true);

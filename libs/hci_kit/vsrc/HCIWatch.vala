@@ -6,6 +6,9 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 	HCIDev dev;
 	HCIInputStream his;
 	protected HCIOutputStream hos;
+	public enum HCIPacket {
+		EVENT_PACKET_HEADER_LEN = 4,
+	}
 	public enum HCIWatchState {
 		IDLE = 0,
 		OPENING,
@@ -28,6 +31,11 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 		dev.close();
 	}
 
+	public int setDevId(etxt*devId) {
+		dev.setDevId(devId);
+		return 0;
+	}
+
 	public int watch() {
 		if(state == HCIWatchState.IDLE)state = HCIWatchState.OPENING;
 		return 0;
@@ -35,6 +43,11 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 
 	public int unwatch() {
 		if(state == HCIWatchState.WATCHING)state = HCIWatchState.CLOSING;
+		return 0;
+	}
+
+	public virtual int onEvent(int type, etxt*resp) {
+		print("There is an event response\n");
 		return 0;
 	}
 
@@ -62,7 +75,24 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 		// see if the is any hci activity ..
 		etxt buf = etxt.stack(512);
 		his.read(&buf);
-		if(buf.length() != 0)print("There is something ..\n");
+
+/*
+typedef struct event_struct {
+  u8 pkt_type;
+  u8 event_type;
+  u8 len;
+  u8 data[0];
+} __attribute__ ((packed)) event_struct;
+ */
+		if(buf.length() != 0) {
+			switch((int)buf.char_at(0)) {
+				case 0x04:
+					onEvent((int)buf.char_at(1), &buf);
+					break;
+				default:
+					break;
+			}
+		}
 		return 0;
 	}
 

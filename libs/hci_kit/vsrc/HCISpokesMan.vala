@@ -38,6 +38,5 @@ public class hciplus.HCISpokesMan : hciplus.HCIEventBroker {
 		pkt.concat_char(0x4); // number of responses
 		hos.writeCommand(HCICommand.INQUERY, HCICommandType.HCI_LINK_CONTROL, &pkt);
 	}
-
 }
 

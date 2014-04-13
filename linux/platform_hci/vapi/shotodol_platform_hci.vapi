@@ -15,7 +15,11 @@ namespace hciplus_platform {
 		public int writeCommand(int ogf, int ocf, int plen, void*param);
 		[CCode (cname="hci_dev_platform_info", cheader_filename = "hciplus_platform.h")]
 		public int platformInfo();
+		[CCode (cname="hci_dev_set_dev_id", cheader_filename = "hciplus_platform.h")]
+		public int setDevId(etxt*devId);
 		[CCode (cname="hci_dev_close", cheader_filename = "hciplus_platform.h")]
 		public int close();
+		[CCode (cname="hci_dev_get_bd_addr", cheader_filename = "hciplus_platform.h")]
+		public static int getBluetoothAddress(etxt*dst, etxt*rawsrc);
 	}
 }
