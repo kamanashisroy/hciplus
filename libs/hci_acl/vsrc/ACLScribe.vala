@@ -11,7 +11,7 @@ public class hciplus.ACLScribe : hciplus.ACLSpokesMan {
 	}
 
 	int onACLConnection(etxt*buf) {
-		if(buf.char_at(3) != 0) {
+		if(buf.char_at(4) != 0) {
 			print("Acl connection creation failed\n");
 		} else {
 			print("Successful\n");

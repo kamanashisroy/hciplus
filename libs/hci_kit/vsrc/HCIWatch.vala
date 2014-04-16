@@ -51,6 +51,10 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 		return 0;
 	}
 
+	public virtual int onSetup() {
+		return 0;
+	}
+
 	public override int start(shotodol.Spindle?plr) {
 		print("Started console stepping ..\n");
 		
@@ -63,6 +67,7 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 				state = HCIWatchState.ERROR;
 			} else {
 				state = HCIWatchState.WATCHING;
+				onSetup();
 			}
 		}
 		if(state == HCIWatchState.CLOSING) {

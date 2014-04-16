@@ -23,6 +23,11 @@ public class hciplus.HCIShell : Replicable {
 		return 0;
 	}
 
+	public int reset() {
+		hci.reset();
+		return 0;
+	}
+
 	public int down() {
 		hci.unwatch();
 		hci.describe("Down ..\n");

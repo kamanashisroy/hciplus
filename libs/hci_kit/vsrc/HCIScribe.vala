@@ -13,11 +13,14 @@ public class hciplus.BluetoothDevice : Replicable {
 
 public class hciplus.HCIScribe : hciplus.HCISpokesMan {
 	ArrayList<BluetoothDevice> devices;
+	int devCount;
 	public HCIScribe(etxt*devName) {
 		base(devName);
 		subscribe(0x22 /* EVT_INQUIRY_RESULT_WITH_RSSI */, onRSSIEvent);
 		subscribe(0x2f /* EVT_INQUIRY_RESULT_WITH_RSSI */, onRSSIEvent);
+		subscribe(0x02 /* EVT_INQUIRY_RESULT */, onInquiryResult);
 		devices = ArrayList<BluetoothDevice>();
+		devCount = 0;
 	}
 
 	~HCIScribe() {
@@ -51,10 +54,44 @@ typedef struct {
 		}
 		dev.pscan_mode = resp.char_at(bitindex+1);
 		dev.clock_offset = resp.char_at(bitindex+4);
-		dev.clock_offset |= (8 <<  ((aroop_uword16)resp.char_at(bitindex+5)));
-		devices.set(0, dev);
+		dev.clock_offset |= (((aroop_uword16)resp.char_at(bitindex+5))<<8);
+		devices.set(devCount++, dev);
 		etxt msg = etxt.stack(128);
-		msg.printf("New device identified ");
+		msg.printf("New device identified %X %X %X "
+			, resp.char_at(6)
+			, resp.char_at(bitindex+1)
+			, dev.clock_offset);
+		dev.copyaddr(&msg);
+		msg.concat_char('\n');
+		msg.zero_terminate();
+		shotodol.Watchdog.logMsgDoNotUse(core.sourceFileName(), core.sourceLineNo(), &msg);
+		return 0;
+	}
+
+	int onInquiryResult(etxt*buf) {
+		etxt resp = etxt.same_same(buf);
+		resp.shift(HCIPacket.EVENT_PACKET_HEADER_LEN); // header length + plen
+		BluetoothDevice dev = new BluetoothDevice();
+		dev.rawaddr[0] = resp.char_at(0);
+		dev.rawaddr[1] = resp.char_at(1);
+		dev.rawaddr[2] = resp.char_at(2);
+		dev.rawaddr[3] = resp.char_at(3);
+		dev.rawaddr[4] = resp.char_at(4);
+		dev.rawaddr[5] = resp.char_at(5);
+		int bitindex = 6;
+		dev.pscan_rep_mode = resp.char_at(bitindex);
+		if(buf.char_at(1) == 0x2F) { // extended
+			bitindex++;
+		}
+		dev.pscan_mode = resp.char_at(bitindex+1);
+		dev.clock_offset = resp.char_at(bitindex+4);
+		dev.clock_offset |= (((aroop_uword16)resp.char_at(bitindex+5))<<8);
+		devices.set(devCount++, dev);
+		etxt msg = etxt.stack(128);
+		msg.printf("New device identified %X %X %X "
+			, resp.char_at(6)
+			, resp.char_at(bitindex+1)
+			, dev.clock_offset);
 		dev.copyaddr(&msg);
 		msg.concat_char('\n');
 		msg.zero_terminate();

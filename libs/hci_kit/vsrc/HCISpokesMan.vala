@@ -1,7 +1,7 @@
 using aroop;
 using hciplus;
 
-public class hciplus.HCISpokesMan : hciplus.HCIEventBroker {
+public class hciplus.HCISpokesMan : hciplus.HCICommandStateMachine {
 	enum HCICommand {
 		INQUIRY = 0x01,
 	}
@@ -10,6 +10,52 @@ public class hciplus.HCISpokesMan : hciplus.HCIEventBroker {
 	}
 	public HCISpokesMan(etxt*devName) {
 		base(devName);
+	}
+
+	public void reset() {
+		etxt pkt = etxt.stack(128);
+		pushCommand(0x03, 0x0003, &pkt);
+		pushCommand(0x04, 0x0003, &pkt);
+		pushCommand(0x04, 0x0001, &pkt);
+		pushCommand(0x04, 0x0009, &pkt);
+		pushCommand(0x04, 0x0005, &pkt);
+		pushCommand(0x03, 0x0023, &pkt);
+		pushCommand(0x03, 0x0014, &pkt);
+		pushCommand(0x03, 0x0025, &pkt);
+		pushCommand(0x03, 0x0038, &pkt);
+		pushCommand(0x03, 0x0039, &pkt);
+		pkt.concat_char(0x00);
+		pushCommand(0x03, 0x0005, &pkt); // clear all filter
+		pkt.trim_to_length(0);
+		pkt.concat_char((uchar)(32000 & 0xFF));
+		pkt.concat_char((uchar)(32000 >> 8));
+		pushCommand(0x03, 0x0016, &pkt); // accept timeout
+		pkt.trim_to_length(0);
+		pushCommand(0x03, 0x001b, &pkt); // read page scan activity
+		pushCommand(0x03, 0x0046, &pkt); // read page scan type
+		pushCommand(0x08, 0x0002, &pkt); // LE read buffer size
+		pushCommand(0x08, 0x0007, &pkt); // LE read advertising channel tx power
+		pushCommand(0x08, 0x000f, &pkt); // LE read white list size
+		pushCommand(0x08, 0x0001, &pkt); // LE supported states
+		pushCommand(0x04, 0x0002, &pkt); // local supported commands
+		pkt.concat_char(0x01);
+		pushCommand(0x03, 0x0056, &pkt); // set simple paring mode
+		pkt.trim_to_length(0);
+		pkt.concat_char(0x02);
+		pushCommand(0x03, 0x0045, &pkt); // set inquiry mode
+		pkt.trim_to_length(0);
+		pushCommand(0x03, 0x0058, &pkt); // read power level while inquiry
+		pkt.concat_char(0x01);
+		pushCommand(0x04, 0x0004, &pkt); // read local extended feature
+		pkt.trim_to_length(0);
+		pkt.concat_char(0x02);
+		pushCommand(0x03, 0x001A, &pkt); // Write scan enable
+		pkt.trim_to_length(0);
+		pkt.concat_char(0x0c);
+		pkt.concat_char(0x01);
+		pkt.concat_char(0x1c);
+		pushCommand(0x03, 0x0024, &pkt); // Write class of device
+		pkt.trim_to_length(0);
 	}
 
 	public void inquiry() {

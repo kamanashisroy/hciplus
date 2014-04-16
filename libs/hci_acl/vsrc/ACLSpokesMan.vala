@@ -21,7 +21,7 @@ typedef struct {
 	uint8_t		role_switch;
 } __attribute__ ((packed)) create_conn_cp;
 #endif
-		etxt pkt = etxt.stack(14);
+		etxt pkt = etxt.stack(14); // plen = 13
 		pkt.concat_char(to.rawaddr[0]); // bluetooth address
 		pkt.concat_char(to.rawaddr[1]); // bluetooth address
 		pkt.concat_char(to.rawaddr[2]); // bluetooth address
@@ -29,15 +29,23 @@ typedef struct {
 		pkt.concat_char(to.rawaddr[4]); // bluetooth address
 		pkt.concat_char(to.rawaddr[5]); // bluetooth address
 		aroop_uword16 ptype = ACLCommand.ACL_PACKET_TYPE;
+		ptype = 0xcc18;
 		pkt.concat_char((aroop_uword8)(ptype & 0xFF)); // pkt_type
 		pkt.concat_char((aroop_uword8)(ptype >> 8)); // pkt_type
-		pkt.concat_char(to.pscan_rep_mode); // pscan rep mode
-		pkt.concat_char(to.pscan_mode); // pscan mode
-		pkt.concat_char((aroop_uword8)(to.clock_offset & 0xFF)); // clock offset
-		pkt.concat_char((aroop_uword8)(to.clock_offset >> 8)); // clock offset
-		//pkt.concat_char(0x0); // clock
-		//pkt.concat_char(0x0); // clock
-		pkt.concat_char(0x0); // role switch, if we have changed ourself from master to slave
+		//pkt.concat_char(to.pscan_rep_mode); // pscan rep mode
+		pkt.concat_char(0x00); // pscan rep mode
+		//pkt.concat_char(to.pscan_mode); // pscan mode
+		pkt.concat_char(0x02); // pscan mode
+		aroop_uword16 clock_offset = 0; // to.clock_offset
+		pkt.concat_char((aroop_uword8)(clock_offset & 0xFF)); // clock offset
+		pkt.concat_char((aroop_uword8)(clock_offset >> 8)); // clock offset
+		pkt.concat_char(0x1); // role switch, if we have changed ourself from master to slave
+#if false
+		print("Connect .. %X %X %X \n"
+			, pkt.char_at(8)
+			, pkt.char_at(9)
+			, to.clock_offset);
+#endif
 		hos.writeCommand(HCISpokesMan.HCICommandType.HCI_LINK_CONTROL, ACLCommand.CREATE_CONNECTION, &pkt);
 	}
 }
