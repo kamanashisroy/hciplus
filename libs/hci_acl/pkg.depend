@@ -1,0 +1,6 @@
+libs/watchdog
+libs/propeller
+libs/iostream
+-HCIPLUS_HOME
+OS_PLATFORM/platform_hci
+libs/hci_kit

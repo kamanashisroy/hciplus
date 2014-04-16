@@ -65,6 +65,7 @@ typedef struct {
 #define hci_dev_write(x, y) ({write((x)->hci_fd, (y)->str, (y)->len);})
 #define hci_dev_write_command(x, y, z, plen, param) ({watchdog_log_string("sending cmd\n");hci_send_cmd((x)->hci_fd, y, z, plen, param);})
 #define hci_dev_platform_info(x) ({(x)->hci_fd;})
-#define hci_dev_get_bd_addr(x,y) ({ba2str((y)->str, (x)->str+(x)->len);})
+#define hci_dev_get_bd_addr(x,y) ({ba2str((y)->str, (x)->str+(x)->len);(x)->len+=17;})
+#define hci_dev_get_bd_addr_from_array(x,y) ({ba2str((y), (x)->str+(x)->len);(x)->len += 17;})
 
 #endif //SHOTODOL_PLUGIN_INCLUDE_H

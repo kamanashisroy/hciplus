@@ -21,5 +21,7 @@ namespace hciplus_platform {
 		public int close();
 		[CCode (cname="hci_dev_get_bd_addr", cheader_filename = "hciplus_platform.h")]
 		public static int getBluetoothAddress(etxt*dst, etxt*rawsrc);
+		[CCode (cname="hci_dev_get_bd_addr_from_array", cheader_filename = "hciplus_platform.h")]
+		public static int getBluetoothAddress2(etxt*dst, aroop_uword8[]rawsrc);
 	}
 }

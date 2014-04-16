@@ -3,16 +3,16 @@ using hciplus;
 
 public class hciplus.HCISpokesMan : hciplus.HCIEventBroker {
 	enum HCICommand {
-		INQUERY = 0x01,
+		INQUIRY = 0x01,
 	}
-	enum HCICommandType {
+	public enum HCICommandType {
 		HCI_LINK_CONTROL = 0x01,
 	}
 	public HCISpokesMan(etxt*devName) {
 		base(devName);
 	}
 
-	public void inquery() {
+	public void inquiry() {
 #if false
 		/* FIXME: Check if lap is valid first */
 		/* Set default lap */
@@ -34,9 +34,9 @@ public class hciplus.HCISpokesMan : hciplus.HCIEventBroker {
 		pkt.concat_char(0x33);
 		pkt.concat_char(0x8b);
 		pkt.concat_char(0x9e);
-		pkt.concat_char(0x4); // inquery length
+		pkt.concat_char(0x4); // inquiry length
 		pkt.concat_char(0x4); // number of responses
-		hos.writeCommand(HCICommand.INQUERY, HCICommandType.HCI_LINK_CONTROL, &pkt);
+		hos.writeCommand(HCICommandType.HCI_LINK_CONTROL, HCICommand.INQUIRY, &pkt);
 	}
 }
 

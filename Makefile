@@ -12,9 +12,11 @@ cleanapps:
 
 makecore:
 	$(BUILD) -C libs/hci_kit
+	$(BUILD) -C libs/hci_acl
 
 cleancore:
 	$(CLEAN) -C libs/hci_kit
+	$(CLEAN) -C libs/hci_acl
 
 clean:cleancore cleanapps
 

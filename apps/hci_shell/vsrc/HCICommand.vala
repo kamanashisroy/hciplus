@@ -9,6 +9,8 @@ public class hciplus.HCICommand : M100Command {
 		UP = 1,
 		DOWN,
 		SCAN,
+		LIST,
+		ACL_CONNECT,
 	}
 	public HCICommand() {
 		base();
@@ -19,9 +21,15 @@ public class hciplus.HCICommand : M100Command {
 		etxt down_help = etxt.from_static("Close dev");
 		etxt scan = etxt.from_static("-scan");
 		etxt scan_help = etxt.from_static("Scan dev");
+		etxt list = etxt.from_static("-l");
+		etxt list_help = etxt.from_static("List devices");
+		etxt acl_connect = etxt.from_static("-acl");
+		etxt acl_connect_help = etxt.from_static("Create acl connection");
 		addOption(&up, M100Command.OptionType.TXT, Options.UP, &up_help);
 		addOption(&down, M100Command.OptionType.NONE, Options.DOWN, &down_help); 
 		addOption(&scan, M100Command.OptionType.NONE, Options.SCAN, &scan_help); 
+		addOption(&list, M100Command.OptionType.NONE, Options.LIST, &list_help); 
+		addOption(&acl_connect, M100Command.OptionType.TXT, Options.ACL_CONNECT, &acl_connect_help); 
 	}
 
 	~HCICommand() {
@@ -42,6 +50,8 @@ public class hciplus.HCICommand : M100Command {
 			if((mod = vals.search(Options.UP, match_all)) != null)shell.up(mod.get());
 			if((mod = vals.search(Options.DOWN, match_all)) != null)shell.down();
 			if((mod = vals.search(Options.SCAN, match_all)) != null) shell.scan();
+			if((mod = vals.search(Options.LIST, match_all)) != null) shell.list(pad);
+			if((mod = vals.search(Options.ACL_CONNECT, match_all)) != null) shell.ACLConnect(mod.get().to_int(), pad);
 			bye(pad, true);
 			return 0;
 		} while(false);
