@@ -1,5 +1,7 @@
-libs/iostream
 core/commands
 core/base
+core/test
+libs/iostream
+libs/unittest
 -PROJECT_HOME
 libs/hci_acl

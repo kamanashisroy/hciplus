@@ -46,7 +46,7 @@ typedef struct {
 		memset(&addr, 0, sizeof(addr)); \
 		addr.hci_family = AF_BLUETOOTH; \
 		addr.hci_dev = (x)->dev_id; \
-		addr.hci_channel = HCI_CHANNEL_USER; \
+		addr.hci_channel = HCI_PLUS_BIND_CHANNEL; \
 		if(bind((x)->hci_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) { \
 			watchdog_log_string("Could not bind\n"); \
 			close((x)->hci_fd); \
