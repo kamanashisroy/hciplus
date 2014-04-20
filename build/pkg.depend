@@ -1,0 +1,5 @@
+libs/hci_kit
+libs/hci_acl
+apps/hci_shell
+
+
