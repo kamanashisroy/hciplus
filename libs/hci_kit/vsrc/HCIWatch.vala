@@ -56,9 +56,44 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 	}
 
 	public override int start(shotodol.Spindle?plr) {
-		print("Started console stepping ..\n");
-		
+		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, "HCIWatch:up");
 		return 0;
+	}
+
+	protected void concat_hexdump(etxt*dst, etxt*src) {
+			int i = 0;
+			int len = src.length();
+			for(i=0;i<len;i++) {
+				uchar dval = src.char_at(i);
+				dst.concat_char('0');
+				dst.concat_char('x');
+				uchar val = (dval & 0xF0) >> 4;
+				uchar c = ((val < 10) ?'0':('A'-10));
+				c += val;
+				dst.concat_char(c);
+				val = dval & 0x0F;
+				c = ((val < 10) ?'0':('A'-10));
+				c += val;
+				dst.concat_char(c);
+				dst.concat_char(',');
+			}
+	}
+
+	protected void tx_wrapper(etxt*cmd) {
+		etxt pkt = etxt.same_same(cmd);
+		etxt dlg = etxt.stack(256);
+		dlg.printf("HCICommandStateMachine:TX[%5d] ", pkt.length());
+		concat_hexdump(&dlg, &pkt);
+		shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 10, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, &dlg);
+		pkt.shift(2);
+		hos.writeCommand(cmd.char_at(0), cmd.char_at(1), &pkt);
+	}
+
+	protected void rx_wrapper(etxt*buf) {
+		etxt dlg = etxt.stack(256);
+		dlg.printf("HCIWatch:Rattling[%5d] ", buf.length());
+		concat_hexdump(&dlg, buf);
+		shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 4, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, &dlg);
 	}
 
 	public override int step() {
@@ -90,6 +125,7 @@ typedef struct event_struct {
 } __attribute__ ((packed)) event_struct;
  */
 		if(buf.length() != 0) {
+			rx_wrapper(&buf);
 			switch((int)buf.char_at(0)) {
 				case 0x04:
 					onEvent((int)buf.char_at(1), &buf);

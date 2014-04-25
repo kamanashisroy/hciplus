@@ -18,12 +18,15 @@ typedef struct {
 #if LINUX_VERSION_CODE <= KERNEL_VERSION(3,11,0)
 #define HCI_PLUS_BIND_CHANNEL HCI_CHANNEL_RAW
 #else
+/*#ifndef HCI_CHANNEL_USER
+#define HCI_CHANNEL_USER 1
+#endif*/
 #define HCI_PLUS_BIND_CHANNEL HCI_CHANNEL_USER
 #endif
 #endif
 
 #include "shotodol_watchdog.h"
-#define watchdog_log_string(x) aroop_cl_shotodol_shotodol_watchdog_logString(__FILE__, __LINE__, x)
+#define watchdog_log_string(x) aroop_cl_shotodol_shotodol_watchdog_logString(__FILE__, __LINE__, 5 , x)
 
 #define hci_dev_new(x,y) ({ \
 	memset(x, 0, sizeof(hci_dev_t)); \

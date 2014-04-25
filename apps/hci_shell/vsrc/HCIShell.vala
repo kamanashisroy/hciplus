@@ -24,6 +24,7 @@ public class hciplus.HCIShell : Replicable {
 	}
 
 	public int reset() {
+		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 10, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, "Reset");
 		hci.reset();
 		return 0;
 	}
@@ -37,7 +38,6 @@ public class hciplus.HCIShell : Replicable {
 	public int scan() {
 		hci.describe("Scanning ..\n");
 		hci.inquiry();
-		hci.describe("Scanning .. ..\n");
 		return 0;
 	}
 

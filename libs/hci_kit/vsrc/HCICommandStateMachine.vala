@@ -6,7 +6,8 @@ public class hciplus.HCICommandStateMachine : hciplus.HCIEventBroker {
 	bool bussy;
 	public HCICommandStateMachine(etxt*devName) {
 		base(devName);
-		subscribe(0x0e/* command complete */, onCommandComplete);
+		subscribe(HCIEvent.COMMAND_COMPLETE, onCommandComplete);
+		subscribe(0x01/* command complete */, onCommandComplete);
 		commands = Queue<txt>();
 		bussy = false;
 	}
@@ -18,26 +19,31 @@ public class hciplus.HCICommandStateMachine : hciplus.HCIEventBroker {
 		((etxt*)cmd).concat(pkt);
 		commands.enqueue(cmd);
 		if(!bussy) {
+			shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 10, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, "Executing Command on request");
 			onCommandComplete(null);
 		}
 	}
 
 	int onCommandComplete(etxt*buf) {
 		bussy = false;
+		if(buf != null) {
+			etxt dlg = etxt.stack(64);
+			dlg.printf("Command (0x%X|0x%X) complete (length:%d)", buf.char_at(3), buf.char_at(4), buf.length());
+			shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 10, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, &dlg);
+		}
 		// push the next command ..
 		txt? cmd = commands.dequeue();
 		if(cmd == null) {
 			return 0;
 		}
-		etxt pkt = etxt.same_same(cmd);
-		pkt.shift(2);
-		hos.writeCommand(cmd.char_at(0), cmd.char_at(1), &pkt);
+		tx_wrapper(cmd);
 		bussy = true;
 		return 0;
 	}
 
 	public override int onSetup() {
 		onCommandComplete(null);
+		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 1, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, "Setup Complete");
 		return 0;
 	}
 }	

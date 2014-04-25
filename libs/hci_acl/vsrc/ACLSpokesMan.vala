@@ -1,7 +1,7 @@
 using aroop;
 using hciplus;
 
-public class hciplus.ACLSpokesMan : HCIScribe {
+public class hciplus.ACLSpokesMan : hciplus.HCIScribe {
 	enum ACLCommand {
 		CREATE_CONNECTION = 0x05,
 		ACL_PACKET_TYPE = 0x0008 | 0x0010 | 0x0400 | 0x0800 | 0x4000 | 0x8000,

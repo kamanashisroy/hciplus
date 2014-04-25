@@ -38,6 +38,7 @@ typedef struct {
 } __attribute__ ((packed)) inquiry_info_with_rssi;
  */
 	int onRSSIEvent(etxt*buf) {
+		print("New rss event");
 		etxt resp = etxt.same_same(buf);
 		resp.shift(HCIPacket.EVENT_PACKET_HEADER_LEN); // header length + plen
 		BluetoothDevice dev = new BluetoothDevice();
@@ -62,9 +63,8 @@ typedef struct {
 			, resp.char_at(bitindex+1)
 			, dev.clock_offset);
 		dev.copyaddr(&msg);
-		msg.concat_char('\n');
 		msg.zero_terminate();
-		shotodol.Watchdog.logMsgDoNotUse(core.sourceFileName(), core.sourceLineNo(), &msg);
+		shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 1, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, &msg);
 		return 0;
 	}
 
@@ -95,7 +95,7 @@ typedef struct {
 		dev.copyaddr(&msg);
 		msg.concat_char('\n');
 		msg.zero_terminate();
-		shotodol.Watchdog.logMsgDoNotUse(core.sourceFileName(), core.sourceLineNo(), &msg);
+		shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 1, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, &msg);
 		return 0;
 	}
 

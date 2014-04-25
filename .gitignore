@@ -1,2 +1,4 @@
 shotodol.bin
 build/.config.mk
+build/Makevars.mk
+/Makefile
