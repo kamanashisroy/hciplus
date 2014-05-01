@@ -1,6 +1,10 @@
 using aroop;
 using hciplus;
 
+/***
+ * \addtogroup hcikit
+ * @{
+ */
 public class hciplus.BluetoothDevice : Replicable {
 	public aroop_uword8 rawaddr[6];
 	public aroop_uword8 pscan_rep_mode;
@@ -103,3 +107,4 @@ typedef struct {
 		return devices.get(i);
 	}
 }
+/** @} */

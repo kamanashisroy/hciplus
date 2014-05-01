@@ -12,6 +12,7 @@ public class hciplus.HCICommand : M100Command {
 		LIST,
 		ACL_CONNECT,
 		RESET,
+		RFCOMM,
 	}
 	public HCICommand() {
 		base();
@@ -28,12 +29,15 @@ public class hciplus.HCICommand : M100Command {
 		etxt acl_connect_help = etxt.from_static("Create acl connection");
 		etxt reset = etxt.from_static("-r");
 		etxt reset_help = etxt.from_static("Reset connection");
-		addOption(&up, M100Command.OptionType.TXT, Options.UP, &up_help);
+		etxt rfcomm = etxt.from_static("-rfcomm");
+		etxt rfcomm_help = etxt.from_static("RFCOMM initiate");
+		addOption(&up, M100Command.OptionType.INT, Options.UP, &up_help);
 		addOption(&down, M100Command.OptionType.NONE, Options.DOWN, &down_help); 
 		addOption(&scan, M100Command.OptionType.NONE, Options.SCAN, &scan_help); 
 		addOption(&list, M100Command.OptionType.NONE, Options.LIST, &list_help); 
-		addOption(&acl_connect, M100Command.OptionType.TXT, Options.ACL_CONNECT, &acl_connect_help); 
+		addOption(&acl_connect, M100Command.OptionType.INT, Options.ACL_CONNECT, &acl_connect_help); 
 		addOption(&reset, M100Command.OptionType.NONE, Options.RESET, &reset_help); 
+		addOption(&rfcomm, M100Command.OptionType.NONE, Options.RFCOMM, &rfcomm_help); 
 	}
 
 	~HCICommand() {
@@ -57,6 +61,7 @@ public class hciplus.HCICommand : M100Command {
 			if((mod = vals.search(Options.RESET, match_all)) != null) shell.reset();
 			if((mod = vals.search(Options.LIST, match_all)) != null) shell.list(pad);
 			if((mod = vals.search(Options.ACL_CONNECT, match_all)) != null) shell.ACLConnect(mod.get().to_int(), pad);
+			if((mod = vals.search(Options.RFCOMM, match_all)) != null) shell.rfcomm();
 			bye(pad, true);
 			return 0;
 		} while(false);

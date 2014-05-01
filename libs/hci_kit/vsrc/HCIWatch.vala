@@ -2,6 +2,10 @@ using aroop;
 using hciplus;
 using hciplus_platform;
 
+/***
+ * \addtogroup hcikit
+ * @{
+ */
 public class hciplus.HCIWatch : shotodol.Spindle {
 	HCIDev dev;
 	HCIInputStream his;
@@ -153,3 +157,4 @@ typedef struct event_struct {
 	}
 }
 
+/** @} */

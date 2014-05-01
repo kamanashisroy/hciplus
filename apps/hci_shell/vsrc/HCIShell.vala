@@ -3,11 +3,11 @@ using shotodol;
 using hciplus;
 
 public class hciplus.HCIShell : Replicable {
-	ACLScribe hci;
+	RFCOMMRuleSet hci;
 
 	public HCIShell() {
 		etxt hcidev = etxt.from_static("0");
-		hci = new ACLScribe(&hcidev);
+		hci = new RFCOMMRuleSet(&hcidev);
 		MainTurbine.gearup(hci);
 	}
 
@@ -46,7 +46,14 @@ public class hciplus.HCIShell : Replicable {
 		if(dev == null)
 			return 0;
 	
+		//hci.LEConnect(dev);
 		hci.ACLConnect(dev);
+		return 0;
+	}
+
+	public int rfcomm() {
+		hci.describe("TODO fill me ..\n");
+		//hci.RFCOMMinit();
 		return 0;
 	}
 

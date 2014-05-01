@@ -57,6 +57,7 @@ if yes_no_to_bool(configLines["LINUX_BLUETOOTH"]) then
 end
 configLines["CFLAGS+"] = configLines["CFLAGS+"] .. " -DPLUGIN_ROOT=\\\"$(PROJECT_HOME)/\\\""
 configLines["VALAFLAGS+"] = ""
+-- configLines["INCLUDES+"] = "-I" .. prompt("Kernel headers /usr/include > ", "/usr/include")
 
 local conf = assert(io.open("build/.config.mk", "w"))
 for x in pairs(configLines) do

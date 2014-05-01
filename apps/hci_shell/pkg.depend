@@ -5,3 +5,4 @@ libs/iostream
 libs/unittest
 -PROJECT_HOME
 libs/hci_acl
+libs/hci_rfcomm

@@ -3,6 +3,10 @@ using shotodol;
 using hciplus;
 using hciplus_platform;
 
+/***
+ * \addtogroup hcikit
+ * @{
+ */
 public class hciplus.HCIOutputStream : OutputStream {
 	HCIDev*dev;
 	bool closed;
@@ -35,3 +39,4 @@ public class hciplus.HCIOutputStream : OutputStream {
 		}
 	}
 }
+/** @} */

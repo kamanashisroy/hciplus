@@ -1,6 +1,10 @@
 using aroop;
 using hciplus;
 
+/***
+ * \addtogroup hcikit
+ * @{
+ */
 public class hciplus.HCICommandStateMachine : hciplus.HCIEventBroker {
 	Queue<txt>commands;
 	bool bussy;
@@ -24,7 +28,7 @@ public class hciplus.HCICommandStateMachine : hciplus.HCIEventBroker {
 		}
 	}
 
-	int onCommandComplete(etxt*buf) {
+	protected int onCommandComplete(etxt*buf) {
 		bussy = false;
 		if(buf != null) {
 			etxt dlg = etxt.stack(64);
@@ -47,3 +51,4 @@ public class hciplus.HCICommandStateMachine : hciplus.HCIEventBroker {
 		return 0;
 	}
 }	
+/** @} */

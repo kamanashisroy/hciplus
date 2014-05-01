@@ -10,20 +10,20 @@ typedef struct {
 	int dev_id;
 } hci_dev_t;
 
-#define HCI_PLUS_BIND_CHANNEL HCI_CHANNEL_RAW
 
-#include <linux/version.h>
-#ifdef KERNEL_VERSION
-#undef HCI_PLUS_BIND_CHANNEL
-#if LINUX_VERSION_CODE <= KERNEL_VERSION(3,11,0)
-#define HCI_PLUS_BIND_CHANNEL HCI_CHANNEL_RAW
-#else
-/*#ifndef HCI_CHANNEL_USER
+//#include <linux/version.h>
+//#ifdef KERNEL_VERSION
+//#undef HCI_PLUS_BIND_CHANNEL
+//#if LINUX_VERSION_CODE <= KERNEL_VERSION(3,11,0)
+//#define HCI_PLUS_BIND_CHANNEL HCI_CHANNEL_RAW
+//#else
+#ifndef HCI_CHANNEL_USER
+//#error "Please use kernel version 3.14 or above"
 #define HCI_CHANNEL_USER 1
-#endif*/
+#endif
 #define HCI_PLUS_BIND_CHANNEL HCI_CHANNEL_USER
-#endif
-#endif
+//#endif
+//#endif
 
 #include "shotodol_watchdog.h"
 #define watchdog_log_string(x) aroop_cl_shotodol_shotodol_watchdog_logString(__FILE__, __LINE__, 5 , x)

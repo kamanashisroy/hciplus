@@ -1,7 +1,7 @@
 hciplus
 ========
 
-This is a group of protocols defined over hci library.
+This is a bundle of bluetooth protocol implementations using hci library.
 
 
 Dependency
@@ -10,4 +10,8 @@ Dependency
 2. shotodol
 3. a hci library
 
+
+Links
+======
+http://wiki.wireshark.org/Bluetooth
 

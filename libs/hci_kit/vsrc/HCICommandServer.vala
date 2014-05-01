@@ -1,11 +1,18 @@
 using aroop;
 using shotodol;
 
-
-public class hciplus.HCICommandServer: Replicable {
-	public CommandSet cmds;
-	public CommandServer() {
-		cmds = new CommandSet();
+/**
+ * \defgroup hcikit An hci wrapper for platform implementation featuring high level api/abstraction.
+ */
+/***
+ * \addtogroup hcikit
+ * @{
+ */
+public class hciplus.HCICommandServer: hciplus.HCICommandStateMachine {
+	public M100CommandSet cmds;
+	public HCICommandServer(etxt*devName) {
+		base(devName);
+		cmds = new M100CommandSet();
 	}
 	public int act_on(etxt*cmd_str, OutputStream pad) {
 		if(cmd_str.char_at(0) == '#') { // skip the comments
@@ -23,3 +30,4 @@ public class hciplus.HCICommandServer: Replicable {
 		return 0;
 	}
 }
+/** @} */

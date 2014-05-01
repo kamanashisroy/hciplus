@@ -1,5 +1,9 @@
 libs/watchdog
 libs/propeller
 libs/iostream
+libs/make100
+core/commands
+OS_PLATFORM/platform_extra
+libs/programming_instruction
 -HCIPLUS_HOME
 OS_PLATFORM/platform_hci
