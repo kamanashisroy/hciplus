@@ -1,11 +1,11 @@
 using aroop;
 using hciplus;
 
-public delegate int hciplus.HCIEventOccured(etxt*buf);
 /***
  * \addtogroup hcikit
  * @{
  */
+public delegate int hciplus.HCIEventOccured(etxt*buf);
 public class hciplus.HCIEventBroker : hciplus.HCIWatch {
 	protected enum HCIEvent {
 		COMMAND_STATUS = 0x0F,
@@ -18,16 +18,17 @@ public class hciplus.HCIEventBroker : hciplus.HCIWatch {
 	HCIEventOccured command_status_subscribers[128];
 	public HCIEventBroker(etxt*devName) {
 		base(devName);
-		subscribe(HCIEvent.COMMAND_STATUS , onCommandStatusEvent);
+		subscribeForIncomingPacket(0x04, onEvent);
+		subscribeForEvent(HCIEvent.COMMAND_STATUS , onCommandStatusEvent);
 	}
 
-	public int subscribe(int type, HCIEventOccured oc) {
+	public int subscribeForEvent(int type, HCIEventOccured oc) {
 		core.assert(type < HCIConfig.MAX_SUBSCRIBERS);
 		subscribers[type] = oc;
 		return 0;
 	}
 
-	public int subscribe_for_command(int type, HCIEventOccured oc) {
+	public int subscribeForEventOnCommand(int type, HCIEventOccured oc) {
 		core.assert(type < HCIConfig.MAX_SUBSCRIBERS);
 		command_status_subscribers[type] = oc;
 		return 0;
@@ -42,12 +43,16 @@ public class hciplus.HCIEventBroker : hciplus.HCIWatch {
 		return 0;
 	}
 
-	public override int onEvent(int type, etxt*resp) {
+	public int onEvent(etxt*resp) {
+		uint etype = resp.char_at(1);
 		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 20, shotodol.Watchdog.WatchdogSeverity.DEBUG, 0, 0, " -- Event");
-		if(subscribers[type] != null) {
-			subscribers[type](resp);
+		if(subscribers[etype] != null) {
+			subscribers[etype](resp);
 		}
 		return 0;
+	}
+	protected uint8 getCommandStatus(etxt*resp) {
+		return resp.char_at(3);
 	}
 }
 

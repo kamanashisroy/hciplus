@@ -66,7 +66,7 @@ public class hciplus.HCIShell : Replicable {
 			}
 			etxt msg = etxt.stack(128);
 			msg.printf("[%5d] -", i);
-			dev.copyaddr(&msg);
+			dev.copyAddressTo(&msg);
 			msg.concat_char('\n');
 			pad.write(&msg);
 		}

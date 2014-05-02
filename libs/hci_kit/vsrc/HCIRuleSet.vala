@@ -56,11 +56,10 @@ public class hciplus.HCIRuleSet : hciplus.HCIScribe {
 			if(cmd == null) {
 				break;
 			}
-			dlg.printf("command:%s\n", cmd.to_string());
-			stdo.write(&dlg);
-			shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(),10,0,0,0,&dlg);
+			//dlg.printf("command:%s\n", cmd.to_string());
+			//shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(),10,0,0,0,&dlg);
 			// execute command
-			act_on(cmd, stdo);
+			cmds.act_on(cmd, stdo);
 		}
 	}
 #if false
@@ -73,10 +72,23 @@ public class hciplus.HCIRuleSet : hciplus.HCIScribe {
 #endif
 	public override int onSetup() {
 		etxt dlg = etxt.stack(128);
-		dlg.printf("onhcisetup");
+		dlg.printf("onhciSetup");
 		HCIExecRule(&dlg);
 		onCommandComplete(null);
 		//base.onSetup();
+		return 0;
+	}
+	protected override int onNewDevice(BluetoothDevice dev) {
+		etxt varName = etxt.from_static("newDevice");
+		etxt varval = etxt.stack(20);
+		dev.copyAddressTo(&varval);
+		shotodol.M100Variable val = new shotodol.M100Variable();
+		val.set(&varval);
+		txt nm = new txt.memcopy_etxt(&varName);
+		cmds.vars.set(nm, val);
+		etxt dlg = etxt.stack(128);
+		dlg.printf("onNewDevice");
+		HCIExecRule(&dlg);
 		return 0;
 	}
 }

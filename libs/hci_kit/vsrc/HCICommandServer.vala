@@ -14,6 +14,7 @@ public class hciplus.HCICommandServer: hciplus.HCICommandStateMachine {
 		base(devName);
 		cmds = new M100CommandSet();
 	}
+#if false
 	public int act_on(etxt*cmd_str, OutputStream pad) {
 		if(cmd_str.char_at(0) == '#') { // skip the comments
 			return 0;
@@ -29,5 +30,6 @@ public class hciplus.HCICommandServer: hciplus.HCICommandStateMachine {
 		mycmd.act_on(cmd_str, pad);
 		return 0;
 	}
+#endif
 }
 /** @} */

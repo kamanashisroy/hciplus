@@ -10,8 +10,8 @@ public class hciplus.HCICommandStateMachine : hciplus.HCIEventBroker {
 	bool bussy;
 	public HCICommandStateMachine(etxt*devName) {
 		base(devName);
-		subscribe(HCIEvent.COMMAND_COMPLETE, onCommandComplete);
-		subscribe(0x01/* command complete */, onCommandComplete);
+		subscribeForEvent(HCIEvent.COMMAND_COMPLETE, onCommandComplete);
+		subscribeForEvent(0x01/* command complete */, onCommandComplete);
 		commands = Queue<txt>();
 		bussy = false;
 	}

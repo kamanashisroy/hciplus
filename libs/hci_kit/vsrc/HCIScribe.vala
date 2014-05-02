@@ -10,7 +10,7 @@ public class hciplus.BluetoothDevice : Replicable {
 	public aroop_uword8 pscan_rep_mode;
 	public aroop_uword8 pscan_mode;
 	public aroop_uword16 clock_offset;
-	public void copyaddr(etxt*buf) {
+	public void copyAddressTo(etxt*buf) {
 		hciplus_platform.HCIDev.getBluetoothAddress2(buf, rawaddr);
 	}
 }
@@ -20,9 +20,9 @@ public class hciplus.HCIScribe : hciplus.HCISpokesMan {
 	int devCount;
 	public HCIScribe(etxt*devName) {
 		base(devName);
-		subscribe(0x22 /* EVT_INQUIRY_RESULT_WITH_RSSI */, onRSSIEvent);
-		subscribe(0x2f /* EVT_INQUIRY_RESULT_WITH_RSSI */, onRSSIEvent);
-		subscribe(0x02 /* EVT_INQUIRY_RESULT */, onInquiryResult);
+		subscribeForEvent(0x22 /* EVT_INQUIRY_RESULT_WITH_RSSI */, onRSSIEvent);
+		subscribeForEvent(0x2f /* EVT_INQUIRY_RESULT_WITH_RSSI */, onRSSIEvent);
+		subscribeForEvent(0x02 /* EVT_INQUIRY_RESULT */, onInquiryResult);
 		devices = ArrayList<BluetoothDevice>();
 		devCount = 0;
 	}
@@ -42,7 +42,6 @@ typedef struct {
 } __attribute__ ((packed)) inquiry_info_with_rssi;
  */
 	int onRSSIEvent(etxt*buf) {
-		print("New rss event");
 		etxt resp = etxt.same_same(buf);
 		resp.shift(HCIPacket.EVENT_PACKET_HEADER_LEN); // header length + plen
 		BluetoothDevice dev = new BluetoothDevice();
@@ -66,9 +65,10 @@ typedef struct {
 			, resp.char_at(6)
 			, resp.char_at(bitindex+1)
 			, dev.clock_offset);
-		dev.copyaddr(&msg);
+		dev.copyAddressTo(&msg);
 		msg.zero_terminate();
 		shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 1, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, &msg);
+		onNewDevice(dev);
 		return 0;
 	}
 
@@ -96,15 +96,20 @@ typedef struct {
 			, resp.char_at(6)
 			, resp.char_at(bitindex+1)
 			, dev.clock_offset);
-		dev.copyaddr(&msg);
+		dev.copyAddressTo(&msg);
 		msg.concat_char('\n');
 		msg.zero_terminate();
 		shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 1, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, &msg);
+		onNewDevice(dev);
 		return 0;
 	}
 
 	public BluetoothDevice? getBluetoothDevice(int i) {
 		return devices.get(i);
+	}
+
+	protected virtual int onNewDevice(BluetoothDevice dev) {
+		return 0;
 	}
 }
 /** @} */

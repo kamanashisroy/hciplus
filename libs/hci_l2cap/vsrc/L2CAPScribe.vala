@@ -1,22 +1,36 @@
 using aroop;
 using hciplus;
 
-public class hciplus.L2CAPScribe : hciplus.ACLSpokesMan {
+public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 	public L2CAPScribe(etxt*devName) {
 		base(devName);
-#if false
-		subscribe_for_acl_response(L2CAPCommand.CONNECT , onL2CAPConnection);
-#endif
 	}
 
-#if false
-	int onL2CAPConnection(etxt*buf) {
-		if(buf.char_at(4) != 0) {
-			shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP connection failed");
-		} else {
-			shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, "L2CAP connection successful");
+	protected override int onL2CAPData(ACLConnection con, etxt*resp) {
+		uint16 dlen = 0;
+		dlen = resp.char_at(5);
+		dlen |= (resp.char_at(6) << 8);
+		uint16 cid = 0;
+		cid = resp.char_at(7);
+		cid |= (resp.char_at(8) << 8);
+		L2CAPConversation?talk = l2capConvs.get(cid);
+		if(talk == null) {
+			talk = new L2CAPConversation(cid);
+			l2capConvs.set(cid, talk);
+		}
+		uint8 cmd = resp.char_at(9);
+		uint8 cmd_id = resp.char_at(10);
+		uint16 cmd_len = 0;
+		cmd_len = resp.char_at(11);
+		cmd_len |= (resp.char_at(12) << 8);
+		uint16 info_type = 0;
+		info_type = resp.char_at(13);
+		info_type |= (resp.char_at(14) << 8);
+		if(cmd == 0x0a/*info request*/) {
+			etxt dlg = etxt.stack(128);
+                	dlg.printf("onL2CAPInfoRequest");
+                	HCIExecRule(&dlg);
 		}
 		return 0;
 	}
-#endif
 }

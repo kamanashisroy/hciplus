@@ -6,10 +6,12 @@ using hciplus_platform;
  * \addtogroup hcikit
  * @{
  */
+public delegate int hciplus.HCIOnIncomingPacket(etxt*buf);
 public class hciplus.HCIWatch : shotodol.Spindle {
 	HCIDev dev;
 	HCIInputStream his;
 	protected HCIOutputStream hos;
+	HCIOnIncomingPacket packetListeners[32];
 	public enum HCIPacket {
 		EVENT_PACKET_HEADER_LEN = 4,
 	}
@@ -35,6 +37,12 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 		dev.close();
 	}
 
+	public int subscribeForIncomingPacket(uint8 type, HCIOnIncomingPacket oip) {
+		core.assert(type < 32);
+		packetListeners[type] = oip;
+		return 0;
+	}
+
 	public int setDevId(etxt*devId) {
 		dev.setDevId(devId);
 		return 0;
@@ -47,11 +55,6 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 
 	public int unwatch() {
 		if(state == HCIWatchState.WATCHING)state = HCIWatchState.CLOSING;
-		return 0;
-	}
-
-	public virtual int onEvent(int type, etxt*resp) {
-		print("There is an event response\n");
 		return 0;
 	}
 
@@ -130,12 +133,9 @@ typedef struct event_struct {
  */
 		if(buf.length() != 0) {
 			rx_wrapper(&buf);
-			switch((int)buf.char_at(0)) {
-				case 0x04:
-					onEvent((int)buf.char_at(1), &buf);
-					break;
-				default:
-					break;
+			uint8 ptype = buf.char_at(0);
+			if(packetListeners[ptype] != null) {
+				packetListeners[ptype](&buf);
 			}
 		}
 		return 0;

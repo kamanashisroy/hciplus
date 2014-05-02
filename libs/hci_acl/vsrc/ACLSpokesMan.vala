@@ -1,6 +1,33 @@
 using aroop;
 using hciplus;
 
+public class hciplus.ACLConnection : Replicable {
+	public BluetoothDevice dev;
+	internal uint16 handle;
+	protected uint8 linkType;
+	protected uint8 encryptionMode;
+	protected uint8 maxSlots;
+	protected enum ACLState {
+		CONNECTING = 0,
+		CONNECTED,
+		CLOSED,
+	}
+	protected ACLState state;
+	internal ACLConnection.fromConnectionCompleteEvent(etxt*resp) {
+		core.assert(resp.char_at(1) == 0x03);
+		handle = resp.char_at(4);
+		handle |= (resp.char_at(5) << 8);
+		linkType = resp.char_at(12);
+		encryptionMode = resp.char_at(13);
+	}
+	internal int update(etxt*resp) {
+		if(resp.char_at(1) == 0x1b) { // max slots
+			maxSlots = resp.char_at(5);
+		}
+		return 0;
+	}
+}
+
 public class hciplus.ACLSpokesMan : hciplus.HCIRuleSet {
 	enum ACLCommand {
 		CREATE_CONNECTION = 0x05,
