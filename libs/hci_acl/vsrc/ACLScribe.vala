@@ -31,6 +31,11 @@ public class hciplus.ACLScribe : hciplus.ACLSpokesMan {
 		if(status == 0) {
 			ACLConnection con = new ACLConnection.fromConnectionCompleteEvent(buf);
 			acls.set(con.handle, con);
+
+			etxt varName = etxt.from_static("connectionID");
+	                etxt varVal = etxt.stack(20);
+			varVal.printf("%d", con.handle);
+			HCISetVariable(&varName, &varVal);
 			etxt dlg = etxt.stack(128);
                 	dlg.printf("onACLConnectionEstablished");
                 	HCIExecRule(&dlg);

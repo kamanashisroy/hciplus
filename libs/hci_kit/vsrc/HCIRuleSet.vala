@@ -91,4 +91,11 @@ public class hciplus.HCIRuleSet : hciplus.HCIScribe {
 		HCIExecRule(&dlg);
 		return 0;
 	}
+	protected int HCISetVariable(etxt*varName,etxt*varVal) {
+               	shotodol.M100Variable val = new shotodol.M100Variable();
+               	val.set(varVal);
+               	txt nm = new txt.memcopy_etxt(varName);
+              	cmds.vars.set(nm, val);
+		return 0;
+	}
 }

@@ -11,7 +11,7 @@ onNewDevice:
 	if $(connecting) echo Connecting
 
 onACLConnectionEstablished:
-	echo New ACL Connection established
+	echo New ACL Connection $(connectionID) established 
 
 onL2CAPInfoRequest:
 	echo info requested
