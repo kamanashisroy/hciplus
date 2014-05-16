@@ -24,6 +24,17 @@ public class hciplus.HCISpokesMan : hciplus.HCICommandServer {
 		base(devName);
 	}
 
+	public void concat_32bit(etxt*pkt, uint32 val) {
+		uchar c = (uchar)(val&0xFF);
+		pkt.concat_char(c);
+		c = (uchar)((val&0xFF00) >> 8);
+		pkt.concat_char(c);
+		c = (uchar)((val&0xFF0000) >> 16);
+		pkt.concat_char(c);
+		c = (uchar)((val&0xFF000000) >> 24);
+		pkt.concat_char(c);
+	}
+
 	public void concat_16bit(etxt*pkt, int val) {
 		uchar c = (uchar)(val&0xFF);
 		pkt.concat_char(c);

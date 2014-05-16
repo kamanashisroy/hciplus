@@ -11,7 +11,7 @@ public class hciplus.ACLScribe : hciplus.ACLSpokesMan {
 		acls = ArrayList<ACLConnection?>();
 		subscribeForEventOnCommand(ACLCommand.CREATE_CONNECTION , onACLConnection);
 		subscribeForEvent(ACLEvent.CONNECT_COMPLETE , onACLConnectionComplete);
-		subscribeForIncomingPacket(0x02 /* ACL Data */ , onACLData);
+		subscribeForIncomingPacket(ACLPacket.ACL_DATA , onACLData);
 	}
 
 	~ACLScribe() {

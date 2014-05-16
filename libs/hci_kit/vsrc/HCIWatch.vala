@@ -86,6 +86,15 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 			}
 	}
 
+	protected void txWrapperRaw(etxt*data) {
+		etxt dlg = etxt.stack(256);
+		dlg.printf("HCIRawDataMachine:TX[%5d] ", data.length());
+		concat_hexdump(&dlg, data);
+		shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 10, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, &dlg);
+		hos.write(data);
+	}
+
+
 	protected void tx_wrapper(etxt*cmd) {
 		etxt pkt = etxt.same_same(cmd);
 		etxt dlg = etxt.stack(256);

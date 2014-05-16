@@ -34,6 +34,9 @@ public class hciplus.ACLSpokesMan : hciplus.HCIRuleSet {
 		LE_CREATE_CONNECTION = 0x0d,
 		ACL_PACKET_TYPE = 0x0008 | 0x0010 | 0x0400 | 0x0800 | 0x4000 | 0x8000,
 	}
+	protected enum ACLPacket {
+		ACL_DATA = 0x02,
+	}
 	public ACLSpokesMan(etxt*devName) {
 		base(devName);
 	}
@@ -101,7 +104,16 @@ typedef struct {
 		//hos.writeCommand(HCISpokesMan.HCICommandType.HCI_LINK_CONTROL, ACLCommand.CREATE_CONNECTION, &pkt);
 	}
 
-	public void sendACLData(etxt*pkt) {
+	public void sendACLData(int handle, etxt*gPkt) {
+		etxt pkt = etxt.stack(64);
+		pkt.concat_char(ACLPacket.ACL_DATA);
+		concat_16bit(&pkt, handle); // handle, PB and BC flag
+		concat_16bit(&pkt, gPkt.length()); // length
+		int pktlen = pkt.length();
+		int payload_len = gPkt.length();
+		pkt.concat(gPkt);
+		core.assert(pkt.length() == (pktlen+payload_len));
+		txWrapperRaw(&pkt);
 	}
 }
 
