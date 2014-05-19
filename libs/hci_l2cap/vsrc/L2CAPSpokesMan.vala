@@ -8,25 +8,50 @@ public class hciplus.L2CAPConversation : Replicable {
 	}
 }
 
+public class hciplus.L2CAPConnection : Replicable {
+	private hashable_ext _ext;
+	public uint mtu;
+	public uint hisToken;
+	public bool mtuIsSet;
+	public L2CAPConnection() {
+	}
+	public void build() {
+		hisToken = 0;
+		mtu = 256;
+		mtuIsSet = false;
+	}
+}
+
 public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 	protected ArrayList<L2CAPConversation?>l2capConvs;
+	protected Factory<L2CAPConnection>l2capForge;
 	int count;
+	uint16 convId;
+	uint8 cmdId;
 	enum L2CAPCommand {
-		CONNECT = 0x02,
+		CONNECT_REQUEST = 0x02,
+		CONNECTION_RESPONSE = 0x03,
+		INFORMATION_REQUEST = 0x0a,
+		INFORMATION_RESPONSE = 0x0b,
+		CONFIGURE_REQUEST = 0x04,
 	}
 
 	public L2CAPSpokesMan(etxt*devName) {
 		base(devName);
 		l2capConvs = ArrayList<L2CAPConversation?>();
+		l2capForge = Factory<L2CAPConnection>.for_type(2, 4, factory_flags.EXTENDED | factory_flags.SWEEP_ON_UNREF | factory_flags.HAS_LOCK);
 		count = 0;
+		convId = 0;
+		cmdId = 0;
 		cmds.register(new hciplus.L2CAPCommand(this));
 	}
 
 	~L2CAPSpokesMan() {
 		l2capConvs.destroy();
+		l2capForge.destroy();
 	}
 
-	enum InformationType {
+	public enum InformationType {
 		EXTENDED_FEATURES_MASK = 0x02,
 		FIXED_CHANNELS_SUPPORTED = 0x03,
 	}
@@ -50,7 +75,7 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		CONNECTIONLESS_RECEPTION = 1<<2,
 	}
 
-	public void sendL2CAPFixedChannelsSupportedInfo(int aclHandle, int l2capConnectionID) {
+	public void sendL2CAPFixedChannelsSupportedInfo(uchar command_identifier, int aclHandle, int l2capConversationID) {
 		etxt pkt = etxt.stack(64);
 		concat_16bit(&pkt, InformationType.FIXED_CHANNELS_SUPPORTED); // extended features mask
 		concat_16bit(&pkt, 0); // Result -> success
@@ -59,10 +84,10 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		concat_32bit(&pkt, 0); 
 		
 		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending information");
-		sendL2CAPInfoCommon(InformationType.FIXED_CHANNELS_SUPPORTED, aclHandle, l2capConnectionID, &pkt);
+		sendL2CAPInfoCommon(command_identifier, aclHandle, l2capConversationID, &pkt);
 	}
 
-	public void sendL2CAPExtendedFeaturesMaskInfo(int aclHandle, int l2capConnectionID) {
+	public void sendL2CAPExtendedFeaturesMaskInfo(uchar command_identifier, int aclHandle, int l2capConversationID) {
 		etxt pkt = etxt.stack(64);
 		concat_16bit(&pkt, InformationType.EXTENDED_FEATURES_MASK); // extended features mask
 		concat_16bit(&pkt, 0); // Result -> success
@@ -70,40 +95,37 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		concat_32bit(&pkt, ExtendedFeaturesMask.ENHANCED_RETRNASMISSION_MODE | ExtendedFeaturesMask.STREAMING_MODE | ExtendedFeaturesMask.FCS | ExtendedFeaturesMask.FIXED_CHANNELS); 
 		
 		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending information");
-		sendL2CAPInfoCommon(InformationType.EXTENDED_FEATURES_MASK, aclHandle, l2capConnectionID, &pkt);
-	}
-
-	public void sendL2CAPInfo(int l2type, int aclHandle, int l2capConnectionID) {
-		if(l2type == InformationType.EXTENDED_FEATURES_MASK)
-			sendL2CAPExtendedFeaturesMaskInfo(aclHandle, l2capConnectionID);
-		else if(l2type == InformationType.FIXED_CHANNELS_SUPPORTED)
-			sendL2CAPFixedChannelsSupportedInfo(aclHandle, l2capConnectionID);
+		sendL2CAPInfoCommon(command_identifier, aclHandle, l2capConversationID, &pkt);
 	}
 
 	public void connectL2CAP(uchar l2type, int aclHandle, int l2capConnectionID) {
+		L2CAPConnection x = l2capForge.alloc_full(0,1);
+		x.build();
+		int token = ((Hashable)x).get_token();
 		etxt pkt = etxt.stack(64);
-		pkt.concat_char(0x02); // connect request
-		pkt.concat_char(0x03); // command identifier
+		pkt.concat_char(L2CAPCommand.CONNECT_REQUEST);
+		cmdId++;
+		pkt.concat_char(cmdId); // command identifier
 		concat_16bit(&pkt, 4); // command length
 		concat_16bit(&pkt, 1); // extended features mask
-		concat_16bit(&pkt, 0x40); // source CID
+		concat_16bit(&pkt, token); // source CID
 		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending connect");
 		sendL2CAP(aclHandle, l2capConnectionID, &pkt);
 	}
 
-	public void sendL2CAPInfoCommon(uchar l2capInfoType, int aclHandle, int l2capConnectionID, etxt*gPkt) {
+	public void sendL2CAPInfoCommon(uchar command_identifier, int aclHandle, int l2capConnectionID, etxt*gPkt) {
 		etxt pkt = etxt.stack(64);
-		pkt.concat_char(0x0b); // information response
-		pkt.concat_char(l2capInfoType);
+		pkt.concat_char(L2CAPCommand.INFORMATION_RESPONSE);
+		pkt.concat_char(command_identifier);
 		concat_16bit(&pkt, gPkt.length());
 		pkt.concat(gPkt); // features
 		sendL2CAP(aclHandle, l2capConnectionID, &pkt);
 	}
 
-	public void sendL2CAP(int aclHandle, int l2capConnectionID, etxt*gPkt) {
+	public void sendL2CAP(int aclHandle, int l2capConversionID, etxt*gPkt) {
 		etxt pkt = etxt.stack(64);
 		concat_16bit(&pkt, gPkt.length()); // length of l2cap packet
-		concat_16bit(&pkt, l2capConnectionID); // Connection ID
+		concat_16bit(&pkt, l2capConversionID); // Connection ID
 		pkt.concat(gPkt); // information response
 		sendACLData(aclHandle, &pkt);
 	}
