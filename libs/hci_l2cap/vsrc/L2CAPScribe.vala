@@ -31,6 +31,10 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 	                etxt varVal = etxt.stack(20);
 			varVal.printf("%d", cid);
 			HCISetVariable(&varName, &varVal);
+			etxt varName2 = etxt.from_static("l2capInfoType");
+	                etxt varVal2 = etxt.stack(20);
+			varVal2.printf("%d", info_type);
+			HCISetVariable(&varName2, &varVal2);
 			etxt dlg = etxt.stack(128);
                 	dlg.printf("onL2CAPInfoRequest");
                 	HCIExecRule(&dlg);

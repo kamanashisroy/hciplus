@@ -46,7 +46,12 @@ typedef struct sig_conreq {
 		sendACLData(handle, &pkt);
 	}
 
-	enum Features {
+	enum InformationType {
+		EXTENDED_FEATURES_MASK = 0x02,
+		FIXED_CHANNELS_SUPPORTED = 0x03,
+	}
+
+	enum ExtendedFeaturesMask {
 		FLOW_CONTROL_MODE = 1,
 		RETRANSMISSION_MODE = 1<<1,
 		BIDIRECTIONAL_QOS = 1<<2,
@@ -60,21 +65,50 @@ typedef struct sig_conreq {
 		
 	}
 
-	public void L2CAPSendInfo(int aclHandle, int l2capConnectionID) {
+	enum FixedChannels {
+		L2CAP_SIGNALING_CHANNEL = 1<<1,
+		CONNECTIONLESS_RECEPTION = 1<<2,
+	}
+
+	public void L2CAPSendFixedChannelsSupportedInfo(int aclHandle, int l2capConnectionID) {
 		etxt pkt = etxt.stack(64);
-		concat_16bit(&pkt, 12); // length of l2cap packet
+		uint16 clen = 12; // length of command
+		concat_16bit(&pkt, clen+4); // length of l2cap packet
 		concat_16bit(&pkt, l2capConnectionID); // Connection ID
 		pkt.concat_char(0x0b); // information response
-		pkt.concat_char(0x02); // command identifier
-		uint16 clen = 8; // length of command
+		pkt.concat_char(InformationType.FIXED_CHANNELS_SUPPORTED); // command identifier
 		concat_16bit(&pkt, clen);
-		concat_16bit(&pkt, 0x02); // extended features mask
+		concat_16bit(&pkt, InformationType.FIXED_CHANNELS_SUPPORTED); // extended features mask
 		concat_16bit(&pkt, 0); // Result -> success
 		// features ..
-		concat_32bit(&pkt, Features.ENHANCED_RETRNASMISSION_MODE | Features.STREAMING_MODE | Features.FCS | Features.FIXED_CHANNELS); 
+		concat_32bit(&pkt, FixedChannels.L2CAP_SIGNALING_CHANNEL | FixedChannels.CONNECTIONLESS_RECEPTION); 
+		concat_32bit(&pkt, 0); 
 		
 		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending information");
 		sendACLData(aclHandle, &pkt);
+	}
+
+	public void L2CAPSendExtendedFeaturesMaskInfo(int aclHandle, int l2capConnectionID) {
+		etxt pkt = etxt.stack(64);
+		uint16 clen = 8; // length of command
+		concat_16bit(&pkt, clen+4); // length of l2cap packet
+		concat_16bit(&pkt, l2capConnectionID); // Connection ID
+		pkt.concat_char(0x0b); // information response
+		pkt.concat_char(InformationType.EXTENDED_FEATURES_MASK); // command identifier
+		concat_16bit(&pkt, clen);
+		concat_16bit(&pkt, InformationType.EXTENDED_FEATURES_MASK); // extended features mask
+		concat_16bit(&pkt, 0); // Result -> success
+		// features ..
+		concat_32bit(&pkt, ExtendedFeaturesMask.ENHANCED_RETRNASMISSION_MODE | ExtendedFeaturesMask.STREAMING_MODE | ExtendedFeaturesMask.FCS | ExtendedFeaturesMask.FIXED_CHANNELS); 
+		
+		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending information");
+		sendACLData(aclHandle, &pkt);
+	}
+	public void L2CAPSendInfo(int l2type, int aclHandle, int l2capConnectionID) {
+		if(l2type == InformationType.EXTENDED_FEATURES_MASK)
+			L2CAPSendExtendedFeaturesMaskInfo(aclHandle, l2capConnectionID);
+		else if(l2type == InformationType.FIXED_CHANNELS_SUPPORTED)
+			L2CAPSendFixedChannelsSupportedInfo(aclHandle, l2capConnectionID);
 	}
 }
 
