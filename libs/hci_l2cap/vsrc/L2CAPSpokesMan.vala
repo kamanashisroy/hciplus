@@ -26,26 +26,6 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		l2capConvs.destroy();
 	}
 
-	public void L2CAPConnect(BluetoothDevice to, int handle) {
-		etxt pkt = etxt.stack(10);
-#if false
-typedef struct sig_cmd {
-        u8 code;
-        u8 id;
-        u16 len;
-        u8 data[0]; 
-} __attribute__ ((packed)) sig_cmd;
-#endif
-#if false
-typedef struct sig_conreq {
-        u16 psm;
-        CID src_cid; /* sending rsp */
-} __attribute__ ((packed)) sig_conreq;
-#endif
-		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP Connecting");
-		sendACLData(handle, &pkt);
-	}
-
 	enum InformationType {
 		EXTENDED_FEATURES_MASK = 0x02,
 		FIXED_CHANNELS_SUPPORTED = 0x03,
@@ -70,14 +50,8 @@ typedef struct sig_conreq {
 		CONNECTIONLESS_RECEPTION = 1<<2,
 	}
 
-	public void L2CAPSendFixedChannelsSupportedInfo(int aclHandle, int l2capConnectionID) {
+	public void sendL2CAPFixedChannelsSupportedInfo(int aclHandle, int l2capConnectionID) {
 		etxt pkt = etxt.stack(64);
-		uint16 clen = 12; // length of command
-		concat_16bit(&pkt, clen+4); // length of l2cap packet
-		concat_16bit(&pkt, l2capConnectionID); // Connection ID
-		pkt.concat_char(0x0b); // information response
-		pkt.concat_char(InformationType.FIXED_CHANNELS_SUPPORTED); // command identifier
-		concat_16bit(&pkt, clen);
 		concat_16bit(&pkt, InformationType.FIXED_CHANNELS_SUPPORTED); // extended features mask
 		concat_16bit(&pkt, 0); // Result -> success
 		// features ..
@@ -85,30 +59,53 @@ typedef struct sig_conreq {
 		concat_32bit(&pkt, 0); 
 		
 		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending information");
-		sendACLData(aclHandle, &pkt);
+		sendL2CAPInfoCommon(InformationType.FIXED_CHANNELS_SUPPORTED, aclHandle, l2capConnectionID, &pkt);
 	}
 
-	public void L2CAPSendExtendedFeaturesMaskInfo(int aclHandle, int l2capConnectionID) {
+	public void sendL2CAPExtendedFeaturesMaskInfo(int aclHandle, int l2capConnectionID) {
 		etxt pkt = etxt.stack(64);
-		uint16 clen = 8; // length of command
-		concat_16bit(&pkt, clen+4); // length of l2cap packet
-		concat_16bit(&pkt, l2capConnectionID); // Connection ID
-		pkt.concat_char(0x0b); // information response
-		pkt.concat_char(InformationType.EXTENDED_FEATURES_MASK); // command identifier
-		concat_16bit(&pkt, clen);
 		concat_16bit(&pkt, InformationType.EXTENDED_FEATURES_MASK); // extended features mask
 		concat_16bit(&pkt, 0); // Result -> success
 		// features ..
 		concat_32bit(&pkt, ExtendedFeaturesMask.ENHANCED_RETRNASMISSION_MODE | ExtendedFeaturesMask.STREAMING_MODE | ExtendedFeaturesMask.FCS | ExtendedFeaturesMask.FIXED_CHANNELS); 
 		
 		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending information");
-		sendACLData(aclHandle, &pkt);
+		sendL2CAPInfoCommon(InformationType.EXTENDED_FEATURES_MASK, aclHandle, l2capConnectionID, &pkt);
 	}
-	public void L2CAPSendInfo(int l2type, int aclHandle, int l2capConnectionID) {
+
+	public void sendL2CAPInfo(int l2type, int aclHandle, int l2capConnectionID) {
 		if(l2type == InformationType.EXTENDED_FEATURES_MASK)
-			L2CAPSendExtendedFeaturesMaskInfo(aclHandle, l2capConnectionID);
+			sendL2CAPExtendedFeaturesMaskInfo(aclHandle, l2capConnectionID);
 		else if(l2type == InformationType.FIXED_CHANNELS_SUPPORTED)
-			L2CAPSendFixedChannelsSupportedInfo(aclHandle, l2capConnectionID);
+			sendL2CAPFixedChannelsSupportedInfo(aclHandle, l2capConnectionID);
+	}
+
+	public void connectL2CAP(uchar l2type, int aclHandle, int l2capConnectionID) {
+		etxt pkt = etxt.stack(64);
+		pkt.concat_char(0x02); // connect request
+		pkt.concat_char(0x03); // command identifier
+		concat_16bit(&pkt, 4); // command length
+		concat_16bit(&pkt, 1); // extended features mask
+		concat_16bit(&pkt, 0x40); // source CID
+		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending connect");
+		sendL2CAP(aclHandle, l2capConnectionID, &pkt);
+	}
+
+	public void sendL2CAPInfoCommon(uchar l2capInfoType, int aclHandle, int l2capConnectionID, etxt*gPkt) {
+		etxt pkt = etxt.stack(64);
+		pkt.concat_char(0x0b); // information response
+		pkt.concat_char(l2capInfoType);
+		concat_16bit(&pkt, gPkt.length());
+		pkt.concat(gPkt); // features
+		sendL2CAP(aclHandle, l2capConnectionID, &pkt);
+	}
+
+	public void sendL2CAP(int aclHandle, int l2capConnectionID, etxt*gPkt) {
+		etxt pkt = etxt.stack(64);
+		concat_16bit(&pkt, gPkt.length()); // length of l2cap packet
+		concat_16bit(&pkt, l2capConnectionID); // Connection ID
+		pkt.concat(gPkt); // information response
+		sendACLData(aclHandle, &pkt);
 	}
 }
 
