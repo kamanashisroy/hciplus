@@ -16,7 +16,7 @@ onACLConnectionEstablished:
 
 onL2CAPInfoRequest:
 	echo info requested $(connectionID), $(l2capConversationID) $(l2capInfoType)
-	l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -l2captype $(l2capInfoType) -l2capcommandid $(l2capCommandId)
+	l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -l2captp $(l2capInfoType) -l2capcmdid $(l2capCommandId)
 	echo L2cap info sent
 	set -var lcapConHere -val 0
 	eq -x $(l2capInfoType) -y 3 -z lcapConHere
@@ -25,11 +25,13 @@ onL2CAPInfoRequest:
 
 onL2CAPConnectionSuccess:
 	echo L2CAP Connection successful
+	l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -l2capcontoken $(l2capConnectionToken) -confreq
 
 onL2CAPConfigureRequest:
-	echo L2CAP Confugration request received, $(l2capConnectionToken)
-	l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -l2capconnectiontoken $(l2capConnectionToken) -configure
+	echo L2CAP Confugration request $(l2capConnectionToken) $(l2capCommandId)
+	l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -l2capcontoken $(l2capConnectionToken) -l2capcmdid $(l2capCommandId) -confresp
 
 onL2CAPConfigureResponse:
 	echo L2CAP Configuration successful
 	sdp -acl $(connectionID) -l2cap $(l2capConversationID)
+

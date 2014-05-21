@@ -159,6 +159,9 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 	        etxt varVal = etxt.stack(20);
 		varVal.printf("%d", token);
 		HCISetVariable(&varName, &varVal);
+		varName = etxt.from_static("l2capCommandId");
+		varVal.printf("%d", cmd_id);
+		HCISetVariable(&varName, &varVal);
 		etxt dlg = etxt.stack(128);
                 dlg.printf("onL2CAPConfigureRequest");
                 HCIExecRule(&dlg);

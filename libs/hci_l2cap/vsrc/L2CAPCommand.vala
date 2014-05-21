@@ -12,7 +12,8 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 		L2CAP_CONNECTION_TOKEN,
 		L2CAP_TYPE,
 		CONNECT,
-		CONFIGURE,
+		CONFIGURE_REQUEST,
+		CONFIGURE_RESPONSE,
 	}
 	public L2CAPCommand(L2CAPSpokesMan gspkr) {
 		base();
@@ -23,21 +24,24 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 		etxt l2capHandle = etxt.from_static("-l2cap");
 		etxt l2capHelp = etxt.from_static("l2cap cid");
 		addOption(&l2capHandle, M100Command.OptionType.INT, Options.L2CAP_CID, &l2capHelp);
-		etxt l2capType = etxt.from_static("-l2captype");
+		etxt l2capType = etxt.from_static("-l2captp");
 		etxt l2capTypeHelp = etxt.from_static("l2cap request type");
 		addOption(&l2capType, M100Command.OptionType.INT, Options.L2CAP_TYPE, &l2capTypeHelp);
-		etxt l2capConnToken = etxt.from_static("-l2capconnectiontoken");
+		etxt l2capConnToken = etxt.from_static("-l2capcontoken");
 		etxt l2capConnTokenHelp = etxt.from_static("l2cap Connection Token");
 		addOption(&l2capConnToken, M100Command.OptionType.INT, Options.L2CAP_CONNECTION_TOKEN, &l2capConnTokenHelp);
-		etxt l2capCommandId = etxt.from_static("-l2capcommandid");
+		etxt l2capCommandId = etxt.from_static("-l2capcmdid");
 		etxt l2capCommandIdHelp = etxt.from_static("Identifier for the command to response to.");
 		addOption(&l2capCommandId, M100Command.OptionType.INT, Options.L2CAP_COMMAND_IDENTIFIER, &l2capCommandIdHelp);
 		etxt connect = etxt.from_static("-connect");
 		etxt connectHelp = etxt.from_static("Create a l2cap connection");
 		addOption(&connect, M100Command.OptionType.NONE, Options.CONNECT, &connectHelp);
-		etxt configure = etxt.from_static("-configure");
-		etxt configureHelp = etxt.from_static("Send l2cap configuration");
-		addOption(&configure, M100Command.OptionType.NONE, Options.CONFIGURE, &configureHelp);
+		etxt configure = etxt.from_static("-confreq");
+		etxt configureHelp = etxt.from_static("Send l2cap configuration request");
+		addOption(&configure, M100Command.OptionType.NONE, Options.CONFIGURE_REQUEST, &configureHelp);
+		etxt configureOK = etxt.from_static("-confresp");
+		etxt configureOKHelp = etxt.from_static("Send l2cap configuration response");
+		addOption(&configureOK, M100Command.OptionType.NONE, Options.CONFIGURE_RESPONSE, &configureOKHelp);
 	}
 
 	~L2CAPCommand() {
@@ -95,8 +99,13 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 				bye(pad, true);
 				return 0;
 			}
-			if((mod = vals.search(Options.CONFIGURE, match_all)) != null) {
-				spkr.sendL2CAPConfigure(aclHandle, l2capHandle, l2capConnectionToken);
+			if((mod = vals.search(Options.CONFIGURE_REQUEST, match_all)) != null) {
+				spkr.sendL2CAPConfigureRequest(aclHandle, l2capHandle, l2capConnectionToken);
+				bye(pad, true);
+				return 0;
+			}
+			if((mod = vals.search(Options.CONFIGURE_RESPONSE, match_all)) != null) {
+				spkr.sendL2CAPConfigureResponse(aclHandle, l2capHandle, l2capConnectionToken, (uchar)cmdId);
 				bye(pad, true);
 				return 0;
 			}

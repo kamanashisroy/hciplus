@@ -55,11 +55,9 @@ public class hciplus.SDPSpokesMan : hciplus.L2CAPScribe {
 	}
 
 	public void SDPPrepareParam(etxt*param) {
-#if false
-		SDPPrepareParamAskProto(param, 0x19, 0x11, 0x1e, 0x00, 0xf0); // ask handfree
-		SDPPrepareParamAskProto(param, 0x09, 0x00, 0x01, 0x00, 0x00); // ask service class
-#endif
-		SDPPrepareParamAskProto(param, 0x19, 0x01, 0x00, 0x0ff0); // ask l2cap
+		//SDPPrepareParamAskProto(param, 0x09, 0x00, 0x01, 0x00, 0x00); // ask service class
+		SDPPrepareParamAskProto(param, 0x19, 0x11, 0x1e, 0xffff); // ask handfree
+		//SDPPrepareParamAskProto(param, 0x19, 0x01, 0x00, 0x0ff0); // ask l2cap
 		SDPPrepareParamAttributeList(param);
 	}
 
@@ -73,10 +71,17 @@ public class hciplus.SDPSpokesMan : hciplus.L2CAPScribe {
 		uint16 tid = tidCount++;
 		SDPTransaction?talk = new SDPTransaction(tid);
 		sdpTransactions.set(tid, talk);
-		concat_16bit(&pkt,tid);
-		concat_16bit(&pkt,params.length());
+		sdp_concat_16bit(&pkt,tid);
+		sdp_concat_16bit(&pkt,(uint16)params.length());
 		pkt.concat(&params);
 		sendL2CAPContent(aclHandle, 0x40/* | l2capConnectionID*/, &pkt);
+	}
+
+	public void sdp_concat_16bit(etxt*pkt, uint16 val) {
+		uchar c = (uchar)((val&0xFF00) >> 8);
+		pkt.concat_char(c);
+		c = (uchar)(val&0xFF);
+		pkt.concat_char(c);
 	}
 }
 

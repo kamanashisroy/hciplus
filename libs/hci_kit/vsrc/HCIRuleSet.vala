@@ -24,9 +24,10 @@ public class hciplus.HCIRuleSet : hciplus.HCIScribe {
 			shotodol.LineInputStream lis = new shotodol.LineInputStream(f);
 			script = new shotodol.M100Script();
 			script.startParsing();
+			etxt buf = etxt.stack(1024);
 			while(true) {
 				try {
-					etxt buf = etxt.stack(128);
+					buf.trim_to_length(0);
 					if(lis.read(&buf) == 0) {
 						break;
 					}
