@@ -34,6 +34,7 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		INFORMATION_REQUEST = 0x0a,
 		INFORMATION_RESPONSE = 0x0b,
 		CONFIGURE_REQUEST = 0x04,
+		CONFIGURE_RESPONSE = 0x05,
 	}
 
 	public L2CAPSpokesMan(etxt*devName) {

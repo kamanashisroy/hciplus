@@ -12,6 +12,7 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 		l2capSubscribeForEvent(L2CAPCommand.INFORMATION_REQUEST, onL2CAPInfoRequest);
 		l2capSubscribeForEvent(L2CAPCommand.CONNECTION_RESPONSE, onL2CAPConnectionResponse);
 		l2capSubscribeForEvent(L2CAPCommand.CONFIGURE_REQUEST, onL2CAPConfigureRequest);
+		l2capSubscribeForEvent(L2CAPCommand.CONFIGURE_RESPONSE, onL2CAPConfigureResponse);
 	}
 
 	public int l2capSubscribeForEvent(int type, L2CAPEventOccured oc) {
@@ -160,6 +161,42 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 		HCISetVariable(&varName, &varVal);
 		etxt dlg = etxt.stack(128);
                 dlg.printf("onL2CAPConfigureRequest");
+                HCIExecRule(&dlg);
+		return 0;
+	}
+
+	protected int onL2CAPConfigureResponse(ACLConnection con, etxt*resp) {
+		uint16 cid = 0;
+		cid = resp.char_at(7);
+		cid |= (resp.char_at(8) << 8);
+		uint8 cmd = resp.char_at(9); // cmd = 3
+		uint8 cmd_id = resp.char_at(10);
+		if(cmd_id >= cmdId) {
+			cmdId += cmd_id;
+		}
+		uint16 cmd_len = 0;
+		cmd_len = resp.char_at(11);
+		cmd_len |= (resp.char_at(12) << 8);
+		uint16 token = 0;
+		token = resp.char_at(13);
+		token |= (resp.char_at(14) << 8);
+		L2CAPConnection?lcon = l2capForge.get(token);
+		if(lcon == null) {
+			etxt dlg = etxt.stack(128);
+			dlg.printf("L2CAP connection(%d) not found", token);
+			shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, &dlg);
+			return 0;
+		}
+		int status = resp.char_at(17);
+		status |= (resp.char_at(18) << 8);
+		if(status != 0) {
+			etxt dlg = etxt.stack(128);
+			dlg.printf("L2CAP connection(%d) configuration failed:%d", token, status);
+			shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, &dlg);
+			return 0;
+		}
+		etxt dlg = etxt.stack(128);
+                dlg.printf("onL2CAPConfigureResponse");
                 HCIExecRule(&dlg);
 		return 0;
 	}
