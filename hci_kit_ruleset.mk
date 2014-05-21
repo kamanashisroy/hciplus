@@ -27,5 +27,6 @@ onL2CAPConnectionSuccess:
 	echo L2CAP Connection successful
 
 onL2CAPConfigureRequest:
-	echo L2CAP Confugration request received
+	echo L2CAP Confugration request received, $(l2capConnectionToken)
+	l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -l2capconnectiontoken $(l2capConnectionToken) -configure
 	sdp -acl $(connectionID) -l2cap $(l2capConversationID)

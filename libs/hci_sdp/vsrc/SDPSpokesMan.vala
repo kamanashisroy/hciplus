@@ -31,21 +31,36 @@ public class hciplus.SDPSpokesMan : hciplus.L2CAPScribe {
 		SERVICE_SEARCH_ATTRIBUTE_REQUEST = 6,
 	}
 
-	public void SDPPrepareParam(etxt*param) {
+	public void SDPPrepareParamAttributeList(etxt*param) {
 		param.concat_char(SDPParams.SERVICE_SEARCH);
-		param.concat_char(3); // length 
-		param.concat_char(0x19); // handsfree
-		param.concat_char(0x11); // handsfree
-		param.concat_char(0x1e); // handsfree
-		param.concat_char(0); // maximum response attribute byte count (msb first)
-		param.concat_char(0xf0); // maximum response attribute byte count (msb first)
-		//concat_16bit(param, 0xf0);
-		param.concat_char(SDPParams.SERVICE_SEARCH);
-		param.concat_char(3); // length 
-		param.concat_char(0x09); // service class id
-		param.concat_char(0); // service class id
-		param.concat_char(0x01); // service class id
+		param.concat_char(5); // length 
+		param.concat_char(0x0a); // list attributes ids
+		param.concat_char(0); // list attributes ids
+		param.concat_char(0); // list attributes ids
+		param.concat_char(0xFF); // list attributes ids
+		param.concat_char(0xFF); // list attributes ids
 		param.concat_char(0); // continue
+	}
+
+	public void SDPPrepareParamAskProto(etxt*param, uchar proto1, uchar proto2, uchar proto3, uint16 size) {
+		param.concat_char(SDPParams.SERVICE_SEARCH);
+		param.concat_char(3); // length 
+		param.concat_char(proto1);
+		param.concat_char(proto2);
+		param.concat_char(proto3);
+		if(size != 0) {
+			param.concat_char((uchar)((size >> 8) & 0xFF)); // maximum response attribute byte count (msb first)
+		}
+		param.concat_char((uchar)(size & 0xFF)); // maximum response attribute byte count (msb first)
+	}
+
+	public void SDPPrepareParam(etxt*param) {
+#if false
+		SDPPrepareParamAskProto(param, 0x19, 0x11, 0x1e, 0x00, 0xf0); // ask handfree
+		SDPPrepareParamAskProto(param, 0x09, 0x00, 0x01, 0x00, 0x00); // ask service class
+#endif
+		SDPPrepareParamAskProto(param, 0x19, 0x01, 0x00, 0x0ff0); // ask l2cap
+		SDPPrepareParamAttributeList(param);
 	}
 
 	public void SDPSearch(int aclHandle, int l2capConnectionID) {

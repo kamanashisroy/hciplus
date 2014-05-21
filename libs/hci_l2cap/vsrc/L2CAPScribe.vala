@@ -48,6 +48,9 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 		cid |= (resp.char_at(8) << 8);
 		uint8 cmd = resp.char_at(9);
 		uint8 cmd_id = resp.char_at(10);
+		if(cmd_id >= cmdId) {
+			cmdId += cmd_id;
+		}
 		uint16 cmd_len = 0;
 		cmd_len = resp.char_at(11);
 		cmd_len |= (resp.char_at(12) << 8);
@@ -76,6 +79,9 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 	protected int onL2CAPConnectionResponse(ACLConnection con, etxt*resp) {
 		uint8 cmd = resp.char_at(9); // cmd = 3
 		uint8 cmd_id = resp.char_at(10);
+		if(cmd_id >= cmdId) {
+			cmdId += cmd_id;
+		}
 		uint16 cmd_len = 0;
 		cmd_len = resp.char_at(11);
 		cmd_len |= (resp.char_at(12) << 8);
@@ -115,6 +121,9 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 		cid |= (resp.char_at(8) << 8);
 		uint8 cmd = resp.char_at(9); // cmd = 3
 		uint8 cmd_id = resp.char_at(10);
+		if(cmd_id >= cmdId) {
+			cmdId += cmd_id;
+		}
 		uint16 cmd_len = 0;
 		cmd_len = resp.char_at(11);
 		cmd_len |= (resp.char_at(12) << 8);

@@ -27,7 +27,7 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 	protected Factory<L2CAPConnection>l2capForge;
 	int count;
 	uint16 convId;
-	uint8 cmdId;
+	protected uint8 cmdId;
 	enum L2CAPCommand {
 		CONNECT_REQUEST = 0x02,
 		CONNECTION_RESPONSE = 0x03,
@@ -73,6 +73,27 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 	enum FixedChannels {
 		L2CAP_SIGNALING_CHANNEL = 1<<1,
 		CONNECTIONLESS_RECEPTION = 1<<2,
+	}
+
+	public void sendL2CAPConfigure(int aclHandle, int l2capConnectionID, int l2capConnectionToken) {
+		L2CAPConnection?lcon = l2capForge.get(l2capConnectionToken);
+		if(lcon == null) {
+			etxt dlg = etxt.stack(128);
+			dlg.printf("L2CAP connection(%d) not found", l2capConnectionToken);
+			shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, &dlg);
+			return;
+		}
+		etxt pkt = etxt.stack(64);
+		pkt.concat_char(L2CAPCommand.CONFIGURE_REQUEST);
+		cmdId++;
+		pkt.concat_char(cmdId); // command identifier
+		concat_16bit(&pkt, 8);
+		concat_16bit(&pkt, (uint16)lcon.hisToken); // destination token
+		concat_16bit(&pkt, 0); // not continued
+		pkt.concat_char(1); // MTU
+		pkt.concat_char(2); // length
+		concat_16bit(&pkt, 256); // mtu = 256
+		sendL2CAPContent(aclHandle, l2capConnectionID, &pkt);
 	}
 
 	public void sendL2CAPFixedChannelsSupportedInfo(uchar command_identifier, int aclHandle, int l2capConversationID) {
