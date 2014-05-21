@@ -2,14 +2,14 @@ using aroop;
 using shotodol;
 using hciplus;
 
-public class hciplus.L2CAPCommand : shotodol.M100Command {
+public class hciplus.SDPCommand : shotodol.M100Command {
 	etxt prfx;
-	L2CAPSpokesMan spkr;
+	SDPSpokesMan spkr;
 	enum Options {
 		ACL_HANDLE = 1,
 		L2CAP_CID,
 	}
-	public L2CAPCommand(L2CAPSpokesMan gspkr) {
+	public SDPCommand(SDPSpokesMan gspkr) {
 		base();
 		spkr = gspkr;
 		etxt aclHandle = etxt.from_static("-acl");
@@ -20,17 +20,16 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 		addOption(&l2capHandle, M100Command.OptionType.INT, Options.L2CAP_CID, &l2capHelp);
 	}
 
-	~L2CAPCommand() {
+	~SDPCommand() {
 	}
 
 	public override etxt*get_prefix() {
-		prfx = etxt.from_static("l2cap");
+		prfx = etxt.from_static("sdp");
 		return &prfx;
 	}
 
 	public override int act_on(etxt*cmdstr, OutputStream pad) {
 		greet(pad);
-		int ecode = 0;
 		SearchableSet<txt> vals = SearchableSet<txt>();
 		parseOptions(cmdstr, &vals);
 		int aclHandle = -1;
@@ -51,7 +50,7 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 			if(arg.is_empty_magical())
 				break;
 			l2capHandle = arg.to_int();
-			//spkr.L2CAPSendInfo(l2type, aclHandle, l2capHandle);
+			spkr.SDPSearch(aclHandle, l2capHandle);
 			bye(pad, true);
 			return 0;
 		} while(false);

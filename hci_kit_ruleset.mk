@@ -1,18 +1,15 @@
 
-connecting = 0
-
 onhciSetup:
 	echo Hci is Up
 	hcikit -reset
 	hcikit -inquiry
+	set -var aclNotConnected -val 1
 
 onNewDevice:
 	echo New device [$(newDeviceID)] $(newDevice)
-	eq -x 1 -y 0$(connecting) -z isConnecting
-	echo $(isConnecting)
-	if not $(isConnecting) echo connecting
-	if not $(isConnecting) hci -acl 0
-	if not $(isConnecting) set -var connecting -val 1
+	if $(aclNotConnected) echo connecting
+	if $(aclNotConnected) acl -devid $(newDeviceID)
+	if $(aclNotConnected) set -var aclNotConnected -val 0
 
 onACLConnectionEstablished:
 	echo New ACL Connection $(connectionID) established 
@@ -31,3 +28,4 @@ onL2CAPConnectionSuccess:
 
 onL2CAPConfigureRequest:
 	echo L2CAP Confugration request received
+	sdp -acl $(connectionID) -l2cap $(l2capConversationID)

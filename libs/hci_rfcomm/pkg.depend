@@ -3,4 +3,4 @@ libs/propeller
 OS_PLATFORM/platform_extra
 -HCIPLUS_HOME
 OS_PLATFORM/platform_hci
-libs/hci_l2cap
+libs/hci_sdp

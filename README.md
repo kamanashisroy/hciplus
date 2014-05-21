@@ -14,4 +14,5 @@ Dependency
 Links
 ======
 http://wiki.wireshark.org/Bluetooth
+http://www.imd.uni-rostock.de/ma/gol/lectures/wirlec/bluetooth_info/l2cap.html
 

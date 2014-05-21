@@ -1,7 +1,7 @@
 using aroop;
 using hciplus;
 
-public class hciplus.RFCOMMSpokesMan : hciplus.L2CAPScribe {
+public class hciplus.RFCOMMSpokesMan : hciplus.SDPScribe {
 	enum RFCOMMCommand {
 #if false
 		REGISTER_PERSISTENT_CHANNEL = 0x46,

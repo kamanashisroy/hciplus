@@ -1,8 +1,8 @@
 using aroop;
 using hciplus;
 
-public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
-	public L2CAPScribe(etxt*devName) {
+public class hciplus.SDPScribe : hciplus.SDPSpokesMan {
+	public SDPScribe(etxt*devName) {
 		base(devName);
 	}
 

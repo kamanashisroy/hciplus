@@ -110,7 +110,7 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		concat_16bit(&pkt, 1); // extended features mask
 		concat_16bit(&pkt, token); // source CID
 		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending connect");
-		sendL2CAP(aclHandle, l2capConnectionID, &pkt);
+		sendL2CAPContent(aclHandle, l2capConnectionID, &pkt);
 	}
 
 	public void sendL2CAPInfoCommon(uchar command_identifier, int aclHandle, int l2capConnectionID, etxt*gPkt) {
@@ -119,14 +119,14 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		pkt.concat_char(command_identifier);
 		concat_16bit(&pkt, gPkt.length());
 		pkt.concat(gPkt); // features
-		sendL2CAP(aclHandle, l2capConnectionID, &pkt);
+		sendL2CAPContent(aclHandle, l2capConnectionID, &pkt);
 	}
 
-	public void sendL2CAP(int aclHandle, int l2capConversionID, etxt*gPkt) {
+	public void sendL2CAPContent(int aclHandle, int l2capConnectionID, etxt*gPkt) {
 		etxt pkt = etxt.stack(64);
 		concat_16bit(&pkt, gPkt.length()); // length of l2cap packet
-		concat_16bit(&pkt, l2capConversionID); // Connection ID
-		pkt.concat(gPkt); // information response
+		concat_16bit(&pkt, l2capConnectionID); // Connection ID
+		pkt.concat(gPkt); // content
 		sendACLData(aclHandle, &pkt);
 	}
 }

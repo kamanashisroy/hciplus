@@ -59,7 +59,9 @@ typedef struct {
 		dev.pscan_mode = resp.char_at(bitindex+1);
 		dev.clock_offset = resp.char_at(bitindex+4);
 		dev.clock_offset |= (((aroop_uword16)resp.char_at(bitindex+5))<<8);
-		devices.set(devCount++, dev);
+		int devID = devCount;
+		devCount++;
+		devices.set(devID, dev);
 		etxt msg = etxt.stack(128);
 		msg.printf("New device identified %X %X %X "
 			, resp.char_at(6)
@@ -68,7 +70,7 @@ typedef struct {
 		dev.copyAddressTo(&msg);
 		msg.zero_terminate();
 		shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 1, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, &msg);
-		onNewDevice(dev);
+		onNewDevice(devID, dev);
 		return 0;
 	}
 
@@ -90,7 +92,9 @@ typedef struct {
 		dev.pscan_mode = resp.char_at(bitindex+1);
 		dev.clock_offset = resp.char_at(bitindex+4);
 		dev.clock_offset |= (((aroop_uword16)resp.char_at(bitindex+5))<<8);
-		devices.set(devCount++, dev);
+		int devID = devCount;
+		devCount++;
+		devices.set(devID, dev);
 		etxt msg = etxt.stack(128);
 		msg.printf("New device identified %X %X %X "
 			, resp.char_at(6)
@@ -100,7 +104,7 @@ typedef struct {
 		msg.concat_char('\n');
 		msg.zero_terminate();
 		shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(), 1, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, &msg);
-		onNewDevice(dev);
+		onNewDevice(devID, dev);
 		return 0;
 	}
 
@@ -108,7 +112,7 @@ typedef struct {
 		return devices.get(i);
 	}
 
-	protected virtual int onNewDevice(BluetoothDevice dev) {
+	protected virtual int onNewDevice(int devID, BluetoothDevice dev) {
 		return 0;
 	}
 }

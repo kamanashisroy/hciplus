@@ -39,6 +39,7 @@ public class hciplus.ACLSpokesMan : hciplus.HCIRuleSet {
 	}
 	public ACLSpokesMan(etxt*devName) {
 		base(devName);
+		cmds.register(new hciplus.ACLConnectCommand(this));
 	}
 
 
@@ -64,6 +65,13 @@ public class hciplus.ACLSpokesMan : hciplus.HCIRuleSet {
 
 		pushCommand(HCISpokesMan.HCICommandType.HCI_LINK_CONTROL, ACLCommand.LE_CREATE_CONNECTION, &pkt);
 		//hos.writeCommand(HCISpokesMan.HCICommandType.HCI_LINK_CONTROL, ACLCommand.LE_CREATE_CONNECTION, &pkt);
+	}
+
+	public void connectACLByID(int id) {
+		BluetoothDevice?dev = getBluetoothDevice(id);
+		if(dev == null)
+			return;
+		ACLConnect(dev);
 	}
 
 	public void ACLConnect(BluetoothDevice to) {

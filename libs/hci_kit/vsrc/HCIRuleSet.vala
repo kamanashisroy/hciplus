@@ -78,17 +78,22 @@ public class hciplus.HCIRuleSet : hciplus.HCIScribe {
 		//base.onSetup();
 		return 0;
 	}
-	protected override int onNewDevice(BluetoothDevice dev) {
+	protected override int onNewDevice(int devID, BluetoothDevice dev) {
 		etxt varName = etxt.from_static("newDevice");
 		etxt varval = etxt.stack(20);
 		dev.copyAddressTo(&varval);
-		shotodol.M100Variable val = new shotodol.M100Variable();
-		val.set(&varval);
-		txt nm = new txt.memcopy_etxt(&varName);
-		cmds.vars.set(nm, val);
-		etxt dlg = etxt.stack(128);
-		dlg.printf("onNewDevice");
+		HCISetVariable(&varName, &varval);
+		etxt varName2 = etxt.from_static("newDeviceID");
+		HCISetVariableInt(&varName2, devID);
+		etxt dlg = etxt.from_static("onNewDevice");
 		HCIExecRule(&dlg);
+		return 0;
+	}
+	protected int HCISetVariableInt(etxt*varName,int intVal) {
+               	shotodol.M100Variable val = new shotodol.M100Variable();
+               	val.setInt(intVal);
+               	txt nm = new txt.memcopy_etxt(varName);
+              	cmds.vars.set(nm, val);
 		return 0;
 	}
 	protected int HCISetVariable(etxt*varName,etxt*varVal) {

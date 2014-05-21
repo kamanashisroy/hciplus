@@ -1,6 +1,7 @@
 libs/hci_kit
 libs/hci_acl
 libs/hci_l2cap
+libs/hci_sdp
 libs/hci_rfcomm
 apps/hci_shell
 
