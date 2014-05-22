@@ -1,5 +1,5 @@
 
-onhciSetup:
+onHciSetup:
 	echo Hci is Up
 	hcikit -reset
 	hcikit -inquiry
@@ -14,7 +14,7 @@ onNewDevice:
 onACLConnectionEstablished:
 	echo New ACL Connection $(connectionID) established 
 
-onL2CAPInfoRequest:
+onL2capInfoRequest:
 	echo info requested $(connectionID), $(l2capConversationID) $(l2capInfoType)
 	l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -l2captp $(l2capInfoType) -l2capcmdid $(l2capCommandId)
 	echo L2cap info sent
@@ -23,15 +23,15 @@ onL2CAPInfoRequest:
 	if $(lcapConHere) echo We should connect here
 	if $(lcapConHere) l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -connect
 
-onL2CAPConnectionSuccess:
+onL2capConnectionSuccess:
 	echo L2CAP Connection successful
 	l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -l2capcontoken $(l2capConnectionToken) -confreq
 
-onL2CAPConfigureRequest:
+onL2capConfigureRequest:
 	echo L2CAP Confugration request $(l2capConnectionToken) $(l2capCommandId)
 	l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -l2capcontoken $(l2capConnectionToken) -l2capcmdid $(l2capCommandId) -confresp
 
-onL2CAPConfigureResponse:
+onL2capConfigureResponse:
 	echo L2CAP Configuration successful
 	sdp -acl $(connectionID) -l2cap $(l2capConversationID)
 

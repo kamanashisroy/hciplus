@@ -72,7 +72,7 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 			varVal2.printf("%d", info_type);
 			HCISetVariable(&varName2, &varVal2);
 			etxt dlg = etxt.stack(128);
-                	dlg.printf("onL2CAPInfoRequest");
+                	dlg.printf("onL2capInfoRequest");
                 	HCIExecRule(&dlg);
 		}
 		return 0;
@@ -110,7 +110,7 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 			HCISetVariable(&varName, &varVal);
 			// connection successful 
 			etxt dlg = etxt.stack(128);
-                	dlg.printf("onL2CAPConnectionSuccess");
+                	dlg.printf("onL2capConnectionSuccess");
                 	HCIExecRule(&dlg);
 		}
 		return 0;
@@ -163,7 +163,7 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 		varVal.printf("%d", cmd_id);
 		HCISetVariable(&varName, &varVal);
 		etxt dlg = etxt.stack(128);
-                dlg.printf("onL2CAPConfigureRequest");
+                dlg.printf("onL2capConfigureRequest");
                 HCIExecRule(&dlg);
 		return 0;
 	}
@@ -199,7 +199,7 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 			return 0;
 		}
 		etxt dlg = etxt.stack(128);
-                dlg.printf("onL2CAPConfigureResponse");
+                dlg.printf("onL2capConfigureResponse");
                 HCIExecRule(&dlg);
 		return 0;
 	}

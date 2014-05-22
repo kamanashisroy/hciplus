@@ -73,7 +73,7 @@ public class hciplus.HCIRuleSet : hciplus.HCIScribe {
 #endif
 	public override int onSetup() {
 		etxt dlg = etxt.stack(128);
-		dlg.printf("onhciSetup");
+		dlg.printf("onHciSetup");
 		HCIExecRule(&dlg);
 		onCommandComplete(null);
 		//base.onSetup();
