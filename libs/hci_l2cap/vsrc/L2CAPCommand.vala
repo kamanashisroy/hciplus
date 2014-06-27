@@ -35,7 +35,7 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 		addOption(&l2capCommandId, M100Command.OptionType.INT, Options.L2CAP_COMMAND_IDENTIFIER, &l2capCommandIdHelp);
 		etxt connect = etxt.from_static("-connect");
 		etxt connectHelp = etxt.from_static("Create a l2cap connection");
-		addOption(&connect, M100Command.OptionType.NONE, Options.CONNECT, &connectHelp);
+		addOption(&connect, M100Command.OptionType.INT, Options.CONNECT, &connectHelp);
 		etxt configure = etxt.from_static("-confreq");
 		etxt configureHelp = etxt.from_static("Send l2cap configuration request");
 		addOption(&configure, M100Command.OptionType.NONE, Options.CONFIGURE_REQUEST, &configureHelp);
@@ -67,6 +67,7 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 		int aclHandle = -1;
 		int l2capHandle = -1;
 		int l2type = 2;
+		int proto = 1; // SDP
 		int l2capConnectionToken = 0;
 		int cmdId = 0;
 		do {
@@ -95,7 +96,8 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 				l2capConnectionToken = mod.get().to_int();
 			}
 			if((mod = vals.search(Options.CONNECT, match_all)) != null) {
-				spkr.connectL2CAP((uchar)l2type, aclHandle, l2capHandle);
+				proto = mod.get().to_int();
+				spkr.connectL2CAP((uchar)l2type, aclHandle, l2capHandle, proto);
 				bye(pad, true);
 				return 0;
 			}

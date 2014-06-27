@@ -74,7 +74,7 @@ public class hciplus.SDPSpokesMan : hciplus.L2CAPScribe {
 		sdp_concat_16bit(&pkt,tid);
 		sdp_concat_16bit(&pkt,(uint16)params.length());
 		pkt.concat(&params);
-		sendL2CAPContent(aclHandle, 0x40/* | l2capConnectionID*/, &pkt);
+		sendL2CAPContent(aclHandle, l2capConnectionID, &pkt);
 	}
 
 	public void sdp_concat_16bit(etxt*pkt, uint16 val) {

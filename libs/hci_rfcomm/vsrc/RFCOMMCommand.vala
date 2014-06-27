@@ -6,22 +6,18 @@ public class hciplus.RFCOMMCommand : shotodol.M100Command {
 	etxt prfx;
 	RFCOMMSpokesMan spkr;
 	enum Options {
-		ACCEPT = 1,
-		GET_CHANNEL,
-		REGISTER_SERVICE,
+		SABM = 1,
+		L2CAP_CID = 1,
 	}
 	public RFCOMMCommand(RFCOMMSpokesMan gspkr) {
 		base();
 		spkr = gspkr;
-		etxt accept = etxt.from_static("-accept");
-		etxt accept_help = etxt.from_static("Accept rfcomm client");
-		etxt getchan = etxt.from_static("-channel");
-		etxt getchan_help = etxt.from_static("Get channel for an rfcomm service");
-		etxt rservice = etxt.from_static("-register");
-		etxt rservice_help = etxt.from_static("register service");
-		addOption(&accept, M100Command.OptionType.TXT, Options.ACCEPT, &accept_help);
-		addOption(&getchan, M100Command.OptionType.TXT, Options.GET_CHANNEL, &getchan_help);
-		addOption(&rservice, M100Command.OptionType.TXT, Options.REGISTER_SERVICE, &rservice_help);
+		etxt sabm = etxt.from_static("-sabm");
+		etxt sabmHelp = etxt.from_static("set assynchronous balanced mode (start a connection) through an acl connection");
+		addOption(&sabm, M100Command.OptionType.INT, Options.SABM, &sabmHelp);
+		etxt l2capcid = etxt.from_static("-l2cap");
+		etxt l2capcidHelp = etxt.from_static("Conversation ID");
+		addOption(&l2capcid, M100Command.OptionType.INT, Options.L2CAP_CID, &l2capcidHelp);
 	}
 
 	~RFCOMMCommand() {
@@ -38,12 +34,10 @@ public class hciplus.RFCOMMCommand : shotodol.M100Command {
 		SearchableSet<txt> vals = SearchableSet<txt>();
 		parseOptions(cmdstr, &vals);
 		do {
-			container<txt>? mod;
-			if((mod = vals.search(Options.ACCEPT, match_all)) != null)spkr.RFCOMMAccept(mod.get().to_int());
-#if false
-			if((mod = vals.search(Options.GET_CHANNEL, match_all)) != null)spkr.RFCOMMRegisterPersistentChannel(mod.get());
-#endif
-			if((mod = vals.search(Options.REGISTER_SERVICE, match_all)) != null)spkr.RFCOMMRegisterService(mod.get().to_int());
+			container<txt>? mod = null;
+			int cid = 0;
+			if((mod = vals.search(Options.L2CAP_CID, match_all)) != null)cid = mod.get().to_int();
+			if((mod = vals.search(Options.SABM, match_all)) != null)spkr.RFCOMMSendSABM(mod.get().to_int(), cid);
 			bye(pad, true);
 			return 0;
 		} while(false);

@@ -140,7 +140,7 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		sendL2CAPInfoCommon(command_identifier, aclHandle, l2capConversationID, &pkt);
 	}
 
-	public void connectL2CAP(uchar l2type, int aclHandle, int l2capConnectionID) {
+	public void connectL2CAP(uchar l2type, int aclHandle, int l2capConnectionID, int proto) {
 		L2CAPConnection x = l2capForge.alloc_full(0,1);
 		x.build();
 		int token = ((Hashable)x).get_token();
@@ -149,7 +149,9 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		cmdId++;
 		pkt.concat_char(cmdId); // command identifier
 		concat_16bit(&pkt, 4); // command length
-		concat_16bit(&pkt, 1); // SDP
+		//concat_16bit(&pkt, 1); // SDP
+		//concat_16bit(&pkt, 0x03); // RFCOMM
+		concat_16bit(&pkt, (uchar)proto);
 		concat_16bit(&pkt, token); // source CID
 		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending connect");
 		sendL2CAPContent(aclHandle, l2capConnectionID, &pkt);

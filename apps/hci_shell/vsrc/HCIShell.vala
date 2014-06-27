@@ -3,11 +3,11 @@ using shotodol;
 using hciplus;
 
 public class hciplus.HCIShell : Replicable {
-	RFCOMMRuleSet hci;
+	RFCOMMScribe hci;
 
 	public HCIShell() {
 		etxt hcidev = etxt.from_static("0");
-		hci = new RFCOMMRuleSet(&hcidev);
+		hci = new RFCOMMScribe(&hcidev);
 		MainTurbine.gearup(hci);
 	}
 

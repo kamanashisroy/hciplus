@@ -5,6 +5,7 @@ public class hciplus.ACLScribe : hciplus.ACLSpokesMan {
 	ArrayList<ACLConnection?> acls;
 	protected enum ACLEvent {
 		CONNECT_COMPLETE = 0x03,
+		CONNECT_REQUEST = 0x04,
 	}
 	public ACLScribe(etxt*devName) {
 		base(devName);
@@ -12,6 +13,7 @@ public class hciplus.ACLScribe : hciplus.ACLSpokesMan {
 		subscribeForEventOnCommand(ACLCommand.CREATE_CONNECTION , onACLConnection);
 		subscribeForEvent(ACLEvent.CONNECT_COMPLETE , onACLConnectionComplete);
 		subscribeForIncomingPacket(ACLPacket.ACL_DATA , onACLData);
+		subscribeForEvent(ACLEvent.CONNECT_REQUEST , onACLConnectRequest);
 	}
 
 	~ACLScribe() {
@@ -26,6 +28,16 @@ public class hciplus.ACLScribe : hciplus.ACLSpokesMan {
 		return 0;
 	}
 
+
+	int onACLConnectRequest(etxt*buf) {
+		etxt dlg = etxt.stack(128);
+               	dlg.printf("onACLConnectRequest");
+               	HCIExecRule(&dlg);
+		return 0;
+	}
+
+
+
 	int onACLConnectionComplete(etxt*buf) {
 		uint8 status = getCommandStatus(buf);
 		if(status == 0) {
@@ -33,9 +45,7 @@ public class hciplus.ACLScribe : hciplus.ACLSpokesMan {
 			acls.set(con.handle, con);
 
 			etxt varName = etxt.from_static("connectionID");
-	                etxt varVal = etxt.stack(20);
-			varVal.printf("%d", con.handle);
-			HCISetVariable(&varName, &varVal);
+			HCISetVariableInt(&varName, con.handle);
 			etxt dlg = etxt.stack(128);
                 	dlg.printf("onACLConnectionEstablished");
                 	HCIExecRule(&dlg);

@@ -11,6 +11,9 @@ onNewDevice:
 	if $(aclNotConnected) acl -devid $(newDeviceID)
 	if $(aclNotConnected) set -var aclNotConnected -val 0
 
+onACLConnectRequest:
+	echo New incomming connection
+
 onACLConnectionEstablished:
 	echo New ACL Connection $(connectionID) established 
 
@@ -21,7 +24,7 @@ onL2capInfoRequest:
 	set -var lcapConHere -val 0
 	eq -x $(l2capInfoType) -y 3 -z lcapConHere
 	if $(lcapConHere) echo We should connect here
-	if $(lcapConHere) l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -connect
+	if $(lcapConHere) l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -connect 3
 
 onL2capConnectionSuccess:
 	echo L2CAP Connection successful
@@ -34,4 +37,5 @@ onL2capConfigureRequest:
 onL2capConfigureResponse:
 	echo L2CAP Configuration successful
 	sdp -acl $(connectionID) -l2cap $(l2capConversationID)
+	rfcomm -sabm $(connectionID) -l2cap $(l2capConversationID)
 
