@@ -59,63 +59,55 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 			spkr.sendL2CAPFixedChannelsSupportedInfo(command_identifier, aclHandle, l2capConversationID);
 	}
 
-	public override int act_on(etxt*cmdstr, OutputStream pad) {
-		greet(pad);
-		int ecode = 0;
+	public override int act_on(etxt*cmdstr, OutputStream pad) throws M100CommandError.ActionFailed {
 		SearchableSet<txt> vals = SearchableSet<txt>();
-		parseOptions(cmdstr, &vals);
+		if(parseOptions(cmdstr, &vals) != 0) {
+			throw new M100CommandError.ActionFailed.INVALID_ARGUMENT("Invalid argument");
+		}
 		int aclHandle = -1;
 		int l2capHandle = -1;
 		int l2type = 2;
 		int proto = 1; // SDP
 		int l2capConnectionToken = 0;
 		int cmdId = 0;
-		do {
-			container<txt>? mod;
-			if((mod = vals.search(Options.ACL_HANDLE, match_all)) == null) {
-				break;
-			}
-			unowned txt ? arg = mod.get();
-			if(arg.is_empty_magical())
-				break;
-			aclHandle = arg.to_int();
-			if((mod = vals.search(Options.L2CAP_CID, match_all)) == null) {
-				break;
-			}
-			arg = mod.get();
-			if(arg.is_empty_magical())
-				break;
-			l2capHandle = arg.to_int();
-			if((mod = vals.search(Options.L2CAP_TYPE, match_all)) != null) {
-				l2type = mod.get().to_int();
-			}
-			if((mod = vals.search(Options.L2CAP_COMMAND_IDENTIFIER, match_all)) != null) {
-				cmdId = mod.get().to_int();
-			}
-			if((mod = vals.search(Options.L2CAP_CONNECTION_TOKEN, match_all)) != null) {
-				l2capConnectionToken = mod.get().to_int();
-			}
-			if((mod = vals.search(Options.CONNECT, match_all)) != null) {
-				proto = mod.get().to_int();
-				spkr.connectL2CAP((uchar)l2type, aclHandle, l2capHandle, proto);
-				bye(pad, true);
-				return 0;
-			}
-			if((mod = vals.search(Options.CONFIGURE_REQUEST, match_all)) != null) {
-				spkr.sendL2CAPConfigureRequest(aclHandle, l2capHandle, l2capConnectionToken);
-				bye(pad, true);
-				return 0;
-			}
-			if((mod = vals.search(Options.CONFIGURE_RESPONSE, match_all)) != null) {
-				spkr.sendL2CAPConfigureResponse(aclHandle, l2capHandle, l2capConnectionToken, (uchar)cmdId);
-				bye(pad, true);
-				return 0;
-			}
-			sendL2CAPInfo(l2type, (uchar)cmdId, aclHandle, l2capHandle);
-			bye(pad, true);
+		container<txt>? mod;
+		if((mod = vals.search(Options.ACL_HANDLE, match_all)) == null) {
+			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
+		}
+		unowned txt ? arg = mod.get();
+		if(arg.is_empty_magical())
+			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
+		aclHandle = arg.to_int();
+		if((mod = vals.search(Options.L2CAP_CID, match_all)) == null) {
+			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
+		}
+		arg = mod.get();
+		if(arg.is_empty_magical())
+			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
+		l2capHandle = arg.to_int();
+		if((mod = vals.search(Options.L2CAP_TYPE, match_all)) != null) {
+			l2type = mod.get().to_int();
+		}
+		if((mod = vals.search(Options.L2CAP_COMMAND_IDENTIFIER, match_all)) != null) {
+			cmdId = mod.get().to_int();
+		}
+		if((mod = vals.search(Options.L2CAP_CONNECTION_TOKEN, match_all)) != null) {
+			l2capConnectionToken = mod.get().to_int();
+		}
+		if((mod = vals.search(Options.CONNECT, match_all)) != null) {
+			proto = mod.get().to_int();
+			spkr.connectL2CAP((uchar)l2type, aclHandle, l2capHandle, proto);
 			return 0;
-		} while(false);
-		bye(pad, false);
+		}
+		if((mod = vals.search(Options.CONFIGURE_REQUEST, match_all)) != null) {
+			spkr.sendL2CAPConfigureRequest(aclHandle, l2capHandle, l2capConnectionToken);
+			return 0;
+		}
+		if((mod = vals.search(Options.CONFIGURE_RESPONSE, match_all)) != null) {
+			spkr.sendL2CAPConfigureResponse(aclHandle, l2capHandle, l2capConnectionToken, (uchar)cmdId);
+			return 0;
+		}
+		sendL2CAPInfo(l2type, (uchar)cmdId, aclHandle, l2capHandle);
 		return 0;
 	}
 }

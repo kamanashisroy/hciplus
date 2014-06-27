@@ -28,19 +28,14 @@ public class hciplus.HCIKitCommand : shotodol.M100Command {
 		return &prfx;
 	}
 
-	public override int act_on(etxt*cmdstr, OutputStream pad) {
-		greet(pad);
-		int ecode = 0;
+	public override int act_on(etxt*cmdstr, OutputStream pad) throws M100CommandError.ActionFailed {
 		SearchableSet<txt> vals = SearchableSet<txt>();
-		parseOptions(cmdstr, &vals);
-		do {
-			container<txt>? mod;
-			if((mod = vals.search(Options.RESET, match_all)) != null)spkr.reset();
-			if((mod = vals.search(Options.INQUIRY, match_all)) != null)spkr.inquiry();
-			bye(pad, true);
-			return 0;
-		} while(false);
-		bye(pad, false);
+		if(parseOptions(cmdstr, &vals) != 0) {
+			throw new M100CommandError.ActionFailed.INVALID_ARGUMENT("Invalid argument");
+		}
+		container<txt>? mod;
+		if((mod = vals.search(Options.RESET, match_all)) != null)spkr.reset();
+		if((mod = vals.search(Options.INQUIRY, match_all)) != null)spkr.inquiry();
 		return 0;
 	}
 }

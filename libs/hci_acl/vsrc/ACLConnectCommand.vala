@@ -24,21 +24,17 @@ public class hciplus.ACLConnectCommand : shotodol.M100Command {
 		return &prfx;
 	}
 
-	public override int act_on(etxt*cmdstr, OutputStream pad) {
-		greet(pad);
+	public override int act_on(etxt*cmdstr, OutputStream pad) throws M100CommandError.ActionFailed {
 		SearchableSet<txt> vals = SearchableSet<txt>();
-		parseOptions(cmdstr, &vals);
-		do {
-			container<txt>? mod;
-			if((mod = vals.search(Options.DEV_ID, match_all)) == null) {
-				break;
-			}
-			int id = mod.get().to_int();
-			spkr.connectACLByID(id);
-			bye(pad, true);
-			return 0;
-		} while(false);
-		bye(pad, false);
+		if(parseOptions(cmdstr, &vals) != 0) {
+			throw new M100CommandError.ActionFailed.INVALID_ARGUMENT("Invalid argument");
+		}
+		container<txt>? mod;
+		if((mod = vals.search(Options.DEV_ID, match_all)) == null) {
+			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
+		}
+		int id = mod.get().to_int();
+		spkr.connectACLByID(id);
 		return 0;
 	}
 }

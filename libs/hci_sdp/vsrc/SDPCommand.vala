@@ -28,33 +28,29 @@ public class hciplus.SDPCommand : shotodol.M100Command {
 		return &prfx;
 	}
 
-	public override int act_on(etxt*cmdstr, OutputStream pad) {
-		greet(pad);
+	public override int act_on(etxt*cmdstr, OutputStream pad) throws M100CommandError.ActionFailed {
 		SearchableSet<txt> vals = SearchableSet<txt>();
-		parseOptions(cmdstr, &vals);
+		if(parseOptions(cmdstr, &vals) != 0) {
+			throw new M100CommandError.ActionFailed.INVALID_ARGUMENT("Invalid argument");
+		}
 		int aclHandle = -1;
 		int l2capHandle = -1;
-		do {
-			container<txt>? mod;
-			if((mod = vals.search(Options.ACL_HANDLE, match_all)) == null) {
-				break;
-			}
-			unowned txt ? arg = mod.get();
-			if(arg.is_empty_magical())
-				break;
-			aclHandle = arg.to_int();
-			if((mod = vals.search(Options.L2CAP_CID, match_all)) == null) {
-				break;
-			}
-			arg = mod.get();
-			if(arg.is_empty_magical())
-				break;
-			l2capHandle = arg.to_int();
-			spkr.SDPSearch(aclHandle, l2capHandle);
-			bye(pad, true);
-			return 0;
-		} while(false);
-		bye(pad, false);
+		container<txt>? mod;
+		if((mod = vals.search(Options.ACL_HANDLE, match_all)) == null) {
+			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
+		}
+		unowned txt ? arg = mod.get();
+		if(arg.is_empty_magical())
+			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
+		aclHandle = arg.to_int();
+		if((mod = vals.search(Options.L2CAP_CID, match_all)) == null) {
+			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
+		}
+		arg = mod.get();
+		if(arg.is_empty_magical())
+			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
+		l2capHandle = arg.to_int();
+		spkr.SDPSearch(aclHandle, l2capHandle);
 		return 0;
 	}
 }

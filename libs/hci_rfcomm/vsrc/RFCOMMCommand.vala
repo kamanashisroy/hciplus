@@ -28,20 +28,16 @@ public class hciplus.RFCOMMCommand : shotodol.M100Command {
 		return &prfx;
 	}
 
-	public override int act_on(etxt*cmdstr, OutputStream pad) {
-		greet(pad);
+	public override int act_on(etxt*cmdstr, OutputStream pad) throws M100CommandError.ActionFailed {
 		int ecode = 0;
 		SearchableSet<txt> vals = SearchableSet<txt>();
-		parseOptions(cmdstr, &vals);
-		do {
-			container<txt>? mod = null;
-			int cid = 0;
-			if((mod = vals.search(Options.L2CAP_CID, match_all)) != null)cid = mod.get().to_int();
-			if((mod = vals.search(Options.SABM, match_all)) != null)spkr.RFCOMMSendSABM(mod.get().to_int(), cid);
-			bye(pad, true);
-			return 0;
-		} while(false);
-		bye(pad, false);
+		if(parseOptions(cmdstr, &vals) != 0) {
+			throw new M100CommandError.ActionFailed.INVALID_ARGUMENT("Invalid argument");
+		}
+		container<txt>? mod = null;
+		int cid = 0;
+		if((mod = vals.search(Options.L2CAP_CID, match_all)) != null)cid = mod.get().to_int();
+		if((mod = vals.search(Options.SABM, match_all)) != null)spkr.RFCOMMSendSABM(mod.get().to_int(), cid);
 		return 0;
 	}
 }
