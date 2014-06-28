@@ -14,6 +14,7 @@ public class hciplus.HCIWatch : shotodol.Spindle {
 	HCIOnIncomingPacket packetListeners[32];
 	public enum HCIPacket {
 		EVENT_PACKET_HEADER_LEN = 4,
+		EVENT_PACKET_HEADER_LEN_WITHOUT_PLEN = 2,
 	}
 	public enum HCIWatchState {
 		IDLE = 0,

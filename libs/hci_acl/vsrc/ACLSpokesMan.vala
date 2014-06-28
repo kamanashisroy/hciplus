@@ -31,6 +31,7 @@ public class hciplus.ACLConnection : Replicable {
 public class hciplus.ACLSpokesMan : hciplus.HCIRuleSet {
 	enum ACLCommand {
 		CREATE_CONNECTION = 0x05,
+		ACCEPT_CONNECTION = 0x09,
 		LE_CREATE_CONNECTION = 0x0d,
 		ACL_PACKET_TYPE = 0x0008 | 0x0010 | 0x0400 | 0x0800 | 0x4000 | 0x8000,
 	}
@@ -74,6 +75,15 @@ public class hciplus.ACLSpokesMan : hciplus.HCIRuleSet {
 		ACLConnect(dev);
 	}
 
+	public void receiveACLByID(int id) {
+		BluetoothDevice?dev = getBluetoothDevice(id);
+		if(dev == null) {
+			shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "ACL connection receive failed: device is null");
+			return;
+		}
+		ACLReceive(dev);
+	}
+
 	public void ACLConnect(BluetoothDevice to) {
 #if false
 typedef struct {
@@ -111,6 +121,20 @@ typedef struct {
 		pushCommand(HCISpokesMan.HCICommandType.HCI_LINK_CONTROL, ACLCommand.CREATE_CONNECTION, &pkt);
 		//hos.writeCommand(HCISpokesMan.HCICommandType.HCI_LINK_CONTROL, ACLCommand.CREATE_CONNECTION, &pkt);
 	}
+
+
+	public void ACLReceive(BluetoothDevice to) {
+		etxt pkt = etxt.stack(10); // plen = 7
+		pkt.concat_char(to.rawaddr[0]); // bluetooth address
+		pkt.concat_char(to.rawaddr[1]); // bluetooth address
+		pkt.concat_char(to.rawaddr[2]); // bluetooth address
+		pkt.concat_char(to.rawaddr[3]); // bluetooth address
+		pkt.concat_char(to.rawaddr[4]); // bluetooth address
+		pkt.concat_char(to.rawaddr[5]); // bluetooth address
+		pkt.concat_char(0x0); // role switch, if we have changed ourself from master to slave
+		pushCommand(HCISpokesMan.HCICommandType.HCI_LINK_CONTROL, ACLCommand.ACCEPT_CONNECTION, &pkt);
+	}
+
 
 	public void sendACLData(int handle, etxt*gPkt) {
 		etxt pkt = etxt.stack(64);

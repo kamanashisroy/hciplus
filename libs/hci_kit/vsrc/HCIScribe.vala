@@ -112,6 +112,25 @@ typedef struct {
 		return devices.get(i);
 	}
 
+	public int getBluetoothDeviceByRawAddr(aroop_uword8[] rawaddr) {
+		int i = 0;
+		for(i = 0; i < devices.count_unsafe(); i++) {
+			BluetoothDevice?dev = devices.get(i);
+			if(dev == null) break;
+			if(rawaddr[0] == dev.rawaddr[0]
+				&& rawaddr[1] == dev.rawaddr[1]
+				&& rawaddr[2] == dev.rawaddr[2]
+				&& rawaddr[3] == dev.rawaddr[3]
+				&& rawaddr[4] == dev.rawaddr[4]
+				&& rawaddr[5] == dev.rawaddr[5]
+			) {
+				shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 1, shotodol.Watchdog.WatchdogSeverity.LOG, 0, 0, "Device Found \n");
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	protected virtual int onNewDevice(int devID, BluetoothDevice dev) {
 		return 0;
 	}

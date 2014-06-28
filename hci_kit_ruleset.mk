@@ -12,7 +12,9 @@ onNewDevice:
 	if $(aclNotConnected) set -var aclNotConnected -val 0
 
 onACLConnectRequest:
-	echo New incomming connection
+	echo New incomming connection from $(devID)
+	echo TODO send connection complete
+	acl -receive -devid $(devID)
 
 onACLConnectionEstablished:
 	echo New ACL Connection $(connectionID) established 

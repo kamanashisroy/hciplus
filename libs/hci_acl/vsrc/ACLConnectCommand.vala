@@ -7,13 +7,17 @@ public class hciplus.ACLConnectCommand : shotodol.M100Command {
 	ACLSpokesMan spkr;
 	enum Options {
 		DEV_ID = 1,
+		RECEIVE,
 	}
 	public ACLConnectCommand(ACLSpokesMan gspkr) {
 		base();
 		spkr = gspkr;
 		etxt dev = etxt.from_static("-devid");
 		etxt devHelp = etxt.from_static("Bluetooth device ID");
+		etxt receive = etxt.from_static("-receive");
+		etxt receiveHelp = etxt.from_static("It is an incoming connection, and we want to allow the connection.");
 		addOption(&dev, M100Command.OptionType.INT, Options.DEV_ID, &devHelp);
+		addOption(&receive, M100Command.OptionType.NONE, Options.RECEIVE, &receiveHelp);
 	}
 
 	~ACLConnectCommand() {
@@ -34,7 +38,13 @@ public class hciplus.ACLConnectCommand : shotodol.M100Command {
 			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
 		}
 		int id = mod.get().to_int();
-		spkr.connectACLByID(id);
+		bool receving = false;
+		if((mod = vals.search(Options.RECEIVE, match_all)) != null) receving = true;
+		if(receving) {
+			spkr.receiveACLByID(id);
+		} else {
+			spkr.connectACLByID(id);
+		}
 		return 0;
 	}
 }
