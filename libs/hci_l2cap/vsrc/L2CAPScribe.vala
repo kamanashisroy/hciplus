@@ -10,6 +10,7 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 	public L2CAPScribe(etxt*devName) {
 		base(devName);
 		l2capSubscribeForEvent(L2CAPCommand.INFORMATION_REQUEST, onL2CAPInfoRequest);
+		l2capSubscribeForEvent(L2CAPCommand.CONNECT_REQUEST, onL2CAPConnectRequest);
 		l2capSubscribeForEvent(L2CAPCommand.CONNECTION_RESPONSE, onL2CAPConnectionResponse);
 		l2capSubscribeForEvent(L2CAPCommand.CONFIGURE_REQUEST, onL2CAPConfigureRequest);
 		l2capSubscribeForEvent(L2CAPCommand.CONFIGURE_RESPONSE, onL2CAPConfigureResponse);
@@ -40,6 +41,40 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 		return 0;
 	}
 
+	protected int onL2CAPConnectRequest(ACLConnection con, etxt*resp) {
+		uint16 dlen = 0;
+		dlen = resp.char_at(5);
+		dlen |= (resp.char_at(6) << 8);
+		uint16 cid = 0;
+		cid = resp.char_at(7);
+		cid |= (resp.char_at(8) << 8);
+		uint8 cmd = resp.char_at(9);
+		uint8 cmd_id = resp.char_at(10);
+		if(cmd_id >= cmdId) {
+			cmdId += cmd_id;
+		}
+		uint16 cmd_len = 0;
+		cmd_len = resp.char_at(11);
+		cmd_len |= (resp.char_at(12) << 8);
+		uint16 conn_type = 0;
+		conn_type = resp.char_at(13);
+		conn_type |= (resp.char_at(14) << 8);
+		uint16 scid = 0;
+		scid = resp.char_at(15);
+		scid |= (resp.char_at(16) << 8);
+		etxt varName = etxt.from_static("l2capConversationID");
+		HCISetVariableInt(&varName, cid);
+		varName.destroy();
+		varName = etxt.from_static("l2capCommandId");
+		HCISetVariableInt(&varName, cmd_id);
+		etxt varName2 = etxt.from_static("l2capConnectionType");
+		HCISetVariableInt(&varName2, conn_type);
+		etxt dlg = etxt.stack(128);
+                dlg.printf("onL2capConnectRequest");
+                HCIExecRule(&dlg);
+		return 0;
+	}
+		
 	protected int onL2CAPInfoRequest(ACLConnection con, etxt*resp) {
 		uint16 dlen = 0;
 		dlen = resp.char_at(5);
@@ -60,17 +95,12 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 		info_type |= (resp.char_at(14) << 8);
 		if(cmd == 0x0a/*info request*/) {
 			etxt varName = etxt.from_static("l2capConversationID");
-	                etxt varVal = etxt.stack(20);
-			varVal.printf("%d", cid);
-			HCISetVariable(&varName, &varVal);
+			HCISetVariableInt(&varName, cid);
 			varName.destroy();
 			varName = etxt.from_static("l2capCommandId");
-			varVal.printf("%d", cmd_id);
-			HCISetVariable(&varName, &varVal);
+			HCISetVariableInt(&varName, cmd_id);
 			etxt varName2 = etxt.from_static("l2capInfoType");
-	                etxt varVal2 = etxt.stack(20);
-			varVal2.printf("%d", info_type);
-			HCISetVariable(&varName2, &varVal2);
+			HCISetVariableInt(&varName2, info_type);
 			etxt dlg = etxt.stack(128);
                 	dlg.printf("onL2capInfoRequest");
                 	HCIExecRule(&dlg);

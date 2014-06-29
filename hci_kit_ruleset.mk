@@ -4,6 +4,7 @@ onHciSetup:
 	hcikit -reset
 	hcikit -inquiry
 	set -var aclNotConnected -val 1
+	set -var incomingACL -val 0
 
 onNewDevice:
 	echo New device [$(newDeviceID)] $(newDevice)
@@ -15,9 +16,14 @@ onACLConnectRequest:
 	echo New incomming connection from $(devID)
 	echo TODO send connection complete
 	acl -receive -devid $(devID)
+	set -var incomingACL -val 1
 
 onACLConnectionEstablished:
 	echo New ACL Connection $(connectionID) established 
+
+onL2capConnectRequest:
+	echo l2cap connect requested $(l2capConversationID), $(l2capConnectionType)
+	echo TODO - we should connect here ..
 
 onL2capInfoRequest:
 	echo info requested $(connectionID), $(l2capConversationID) $(l2capInfoType)
@@ -25,6 +31,7 @@ onL2capInfoRequest:
 	echo L2cap info sent
 	set -var lcapConHere -val 0
 	eq -x $(l2capInfoType) -y 3 -z lcapConHere
+	if $(incomingACL) set -var lcapConHere -val 0
 	if $(lcapConHere) echo We should connect here
 	if $(lcapConHere) l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -connect 3
 
