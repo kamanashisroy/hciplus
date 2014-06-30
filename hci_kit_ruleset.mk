@@ -14,7 +14,6 @@ onNewDevice:
 
 onACLConnectRequest:
 	echo New incomming connection from $(devID)
-	echo TODO send connection complete
 	acl -receive -devid $(devID)
 	set -var incomingACL -val 1
 
@@ -23,7 +22,8 @@ onACLConnectionEstablished:
 
 onL2capConnectRequest:
 	echo l2cap connect requested $(l2capConversationID), $(l2capConnectionType)
-	echo TODO - we should connect here ..
+	l2cap -accept -acl $(connectionID) -l2cap $(l2capConversationID) -l2capcmdid $(l2capCommandId) -l2capcontoken $(l2capConnectionToken)
+	echo We allowed connection ..
 
 onL2capInfoRequest:
 	echo info requested $(connectionID), $(l2capConversationID) $(l2capInfoType)

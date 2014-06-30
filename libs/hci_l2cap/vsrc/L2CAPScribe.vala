@@ -67,8 +67,12 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 		varName.destroy();
 		varName = etxt.from_static("l2capCommandId");
 		HCISetVariableInt(&varName, cmd_id);
-		etxt varName2 = etxt.from_static("l2capConnectionType");
-		HCISetVariableInt(&varName2, conn_type);
+		varName.destroy();
+		varName = etxt.from_static("l2capConnectionType");
+		HCISetVariableInt(&varName, conn_type);
+		varName.destroy();
+		varName = etxt.from_static("l2capConnectionToken");
+		HCISetVariableInt(&varName, scid);
 		etxt dlg = etxt.stack(128);
                 dlg.printf("onL2capConnectRequest");
                 HCIExecRule(&dlg);
@@ -135,9 +139,7 @@ public class hciplus.L2CAPScribe : hciplus.L2CAPSpokesMan {
 		result |= (resp.char_at(17) << 8);
 		if(result == 0) {
 			etxt varName = etxt.from_static("l2capConnectionToken");
-	        	etxt varVal = etxt.stack(20);
-			varVal.printf("%d", my_token);
-			HCISetVariable(&varName, &varVal);
+			HCISetVariableInt(&varName, my_token);
 			// connection successful 
 			etxt dlg = etxt.stack(128);
                 	dlg.printf("onL2capConnectionSuccess");

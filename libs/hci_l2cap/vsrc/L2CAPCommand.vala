@@ -12,6 +12,7 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 		L2CAP_CONNECTION_TOKEN,
 		L2CAP_TYPE,
 		CONNECT,
+		ACCEPT,
 		CONFIGURE_REQUEST,
 		CONFIGURE_RESPONSE,
 	}
@@ -36,6 +37,9 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 		etxt connect = etxt.from_static("-connect");
 		etxt connectHelp = etxt.from_static("Create a l2cap connection");
 		addOption(&connect, M100Command.OptionType.INT, Options.CONNECT, &connectHelp);
+		etxt accept = etxt.from_static("-accept");
+		etxt acceptHelp = etxt.from_static("Accept a l2cap connection");
+		addOption(&accept, M100Command.OptionType.NONE, Options.ACCEPT, &acceptHelp);
 		etxt configure = etxt.from_static("-confreq");
 		etxt configureHelp = etxt.from_static("Send l2cap configuration request");
 		addOption(&configure, M100Command.OptionType.NONE, Options.CONFIGURE_REQUEST, &configureHelp);
@@ -67,7 +71,6 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 		int aclHandle = -1;
 		int l2capHandle = -1;
 		int l2type = 2;
-		int proto = 1; // SDP
 		int l2capConnectionToken = 0;
 		int cmdId = 0;
 		container<txt>? mod;
@@ -95,8 +98,13 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 			l2capConnectionToken = mod.get().to_int();
 		}
 		if((mod = vals.search(Options.CONNECT, match_all)) != null) {
+			int proto = 1; // SDP
 			proto = mod.get().to_int();
 			spkr.connectL2CAP((uchar)l2type, aclHandle, l2capHandle, proto);
+			return 0;
+		}
+		if((mod = vals.search(Options.ACCEPT, match_all)) != null) {
+			spkr.acceptL2CAP(aclHandle, l2capHandle, (aroop_uword8)cmdId, l2capConnectionToken);
 			return 0;
 		}
 		if((mod = vals.search(Options.CONFIGURE_REQUEST, match_all)) != null) {
@@ -104,10 +112,10 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 			return 0;
 		}
 		if((mod = vals.search(Options.CONFIGURE_RESPONSE, match_all)) != null) {
-			spkr.sendL2CAPConfigureResponse(aclHandle, l2capHandle, l2capConnectionToken, (uchar)cmdId);
+			spkr.sendL2CAPConfigureResponse(aclHandle, l2capHandle, l2capConnectionToken, (aroop_uword8)cmdId);
 			return 0;
 		}
-		sendL2CAPInfo(l2type, (uchar)cmdId, aclHandle, l2capHandle);
+		sendL2CAPInfo(l2type, (aroop_uword8)cmdId, aclHandle, l2capHandle);
 		return 0;
 	}
 }

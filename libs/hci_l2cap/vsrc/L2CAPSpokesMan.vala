@@ -117,7 +117,7 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		sendL2CAPContent(aclHandle, l2capConnectionID, &pkt);
 	}
 
-	public void sendL2CAPFixedChannelsSupportedInfo(uchar command_identifier, int aclHandle, int l2capConversationID) {
+	public void sendL2CAPFixedChannelsSupportedInfo(aroop_uword8 command_identifier, int aclHandle, int l2capConversationID) {
 		etxt pkt = etxt.stack(64);
 		concat_16bit(&pkt, InformationType.FIXED_CHANNELS_SUPPORTED); // extended features mask
 		concat_16bit(&pkt, 0); // Result -> success
@@ -129,7 +129,7 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		sendL2CAPInfoCommon(command_identifier, aclHandle, l2capConversationID, &pkt);
 	}
 
-	public void sendL2CAPExtendedFeaturesMaskInfo(uchar command_identifier, int aclHandle, int l2capConversationID) {
+	public void sendL2CAPExtendedFeaturesMaskInfo(aroop_uword8 command_identifier, int aclHandle, int l2capConversationID) {
 		etxt pkt = etxt.stack(64);
 		concat_16bit(&pkt, InformationType.EXTENDED_FEATURES_MASK); // extended features mask
 		concat_16bit(&pkt, 0); // Result -> success
@@ -156,6 +156,26 @@ public class hciplus.L2CAPSpokesMan : hciplus.ACLScribe {
 		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending connect");
 		sendL2CAPContent(aclHandle, l2capConnectionID, &pkt);
 	}
+
+
+	public void acceptL2CAP(int aclHandle, int l2capConnectionID, aroop_uword8 l2capConnectCommandID, int l2capSourceCID) {
+		L2CAPConnection x = l2capForge.alloc_full(0,1);
+		x.build();
+		x.hisToken = l2capSourceCID;
+		int token = ((Hashable)x).get_token();
+		etxt pkt = etxt.stack(32);
+		pkt.concat_char(L2CAPCommand.CONNECTION_RESPONSE);
+		pkt.concat_char(l2capConnectCommandID); // command identifier
+		concat_16bit(&pkt, 8); // command length
+		concat_16bit(&pkt, token); // destination CID
+		concat_16bit(&pkt, l2capSourceCID); // source CID
+		//concat_char(&pkt, 1); // pending 
+		concat_16bit(&pkt, 0); // success 
+		concat_16bit(&pkt, 0); // no further information 
+		shotodol.Watchdog.watchit_string(core.sourceFileName(), core.sourceLineNo(), 5, shotodol.Watchdog.WatchdogSeverity.ERROR, 0, 0, "L2CAP sending accept");
+		sendL2CAPContent(aclHandle, l2capConnectionID, &pkt);
+	}
+
 
 	public void sendL2CAPInfoCommon(uchar command_identifier, int aclHandle, int l2capConnectionID, etxt*gPkt) {
 		etxt pkt = etxt.stack(64);
