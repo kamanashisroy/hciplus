@@ -60,7 +60,7 @@ public class hciplus.HCIRuleSet : hciplus.HCIScribe {
 			//dlg.printf("command:%s\n", cmd.to_string());
 			//shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(),10,0,0,0,&dlg);
 			// execute command
-			cmds.act_on(cmd, stdo);
+			cmds.act_on(cmd, stdo, script);
 		}
 	}
 #if false

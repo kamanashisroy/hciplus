@@ -8,9 +8,10 @@ onHciSetup:
 
 onNewDevice:
 	echo New device [$(newDeviceID)] $(newDevice)
-	if $(aclNotConnected) echo connecting
-	if $(aclNotConnected) acl -devid $(newDeviceID)
-	if $(aclNotConnected) set -var aclNotConnected -val 0
+	if $(aclNotConnected) 
+		echo connecting
+		acl -devid $(newDeviceID)
+		set -var aclNotConnected -val 0
 
 onACLConnectRequest:
 	echo New incomming connection from $(devID)
@@ -31,9 +32,11 @@ onL2capInfoRequest:
 	echo L2cap info sent
 	set -var lcapConHere -val 0
 	eq -x $(l2capInfoType) -y 3 -z lcapConHere
-	if $(incomingACL) set -var lcapConHere -val 0
-	if $(lcapConHere) echo We should connect here
-	if $(lcapConHere) l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -connect 3
+	if $(incomingACL)
+		set -var lcapConHere -val 0
+	if $(lcapConHere)
+		echo We should connect here
+		l2cap -acl $(connectionID) -l2cap $(l2capConversationID) -connect 3
 
 onL2capConnectionSuccess:
 	echo L2CAP Connection successful
