@@ -19,33 +19,15 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 	public L2CAPCommand(L2CAPSpokesMan gspkr) {
 		base();
 		spkr = gspkr;
-		etxt aclHandle = etxt.from_static("-acl");
-		etxt aclHelp = etxt.from_static("acl handle");
-		addOption(&aclHandle, M100Command.OptionType.INT, Options.ACL_HANDLE, &aclHelp);
-		etxt l2capHandle = etxt.from_static("-l2cap");
-		etxt l2capHelp = etxt.from_static("l2cap cid");
-		addOption(&l2capHandle, M100Command.OptionType.INT, Options.L2CAP_CID, &l2capHelp);
-		etxt l2capType = etxt.from_static("-l2captp");
-		etxt l2capTypeHelp = etxt.from_static("l2cap request type");
-		addOption(&l2capType, M100Command.OptionType.INT, Options.L2CAP_TYPE, &l2capTypeHelp);
-		etxt l2capConnToken = etxt.from_static("-l2capcontoken");
-		etxt l2capConnTokenHelp = etxt.from_static("l2cap Connection Token");
-		addOption(&l2capConnToken, M100Command.OptionType.INT, Options.L2CAP_CONNECTION_TOKEN, &l2capConnTokenHelp);
-		etxt l2capCommandId = etxt.from_static("-l2capcmdid");
-		etxt l2capCommandIdHelp = etxt.from_static("Identifier for the command to response to.");
-		addOption(&l2capCommandId, M100Command.OptionType.INT, Options.L2CAP_COMMAND_IDENTIFIER, &l2capCommandIdHelp);
-		etxt connect = etxt.from_static("-connect");
-		etxt connectHelp = etxt.from_static("Create a l2cap connection");
-		addOption(&connect, M100Command.OptionType.INT, Options.CONNECT, &connectHelp);
-		etxt accept = etxt.from_static("-accept");
-		etxt acceptHelp = etxt.from_static("Accept a l2cap connection");
-		addOption(&accept, M100Command.OptionType.NONE, Options.ACCEPT, &acceptHelp);
-		etxt configure = etxt.from_static("-confreq");
-		etxt configureHelp = etxt.from_static("Send l2cap configuration request");
-		addOption(&configure, M100Command.OptionType.NONE, Options.CONFIGURE_REQUEST, &configureHelp);
-		etxt configureOK = etxt.from_static("-confresp");
-		etxt configureOKHelp = etxt.from_static("Send l2cap configuration response");
-		addOption(&configureOK, M100Command.OptionType.NONE, Options.CONFIGURE_RESPONSE, &configureOKHelp);
+		addOptionString("-acl", M100Command.OptionType.INT, Options.ACL_HANDLE, "acl handle.");
+		addOptionString("-l2cap", M100Command.OptionType.INT, Options.L2CAP_CID, "l2cap cid.");
+		addOptionString("l2captp", M100Command.OptionType.INT, Options.L2CAP_TYPE, "l2cap request type.");
+		addOptionString("-l2capcontoken", M100Command.OptionType.INT, Options.L2CAP_CONNECTION_TOKEN, "l2cap connection token.");
+		addOptionString("-l2capcmdid", M100Command.OptionType.INT, Options.L2CAP_COMMAND_IDENTIFIER, "Identifier for the command to response to.");
+		addOptionString("-connect", M100Command.OptionType.INT, Options.CONNECT, "Create a l2cap connection");
+		addOptionString("-accept", M100Command.OptionType.NONE, Options.ACCEPT, "Accept a l2cap connection.");
+		addOptionString("-confreq", M100Command.OptionType.NONE, Options.CONFIGURE_REQUEST, "Send l2cap configuration request");
+		addOptionString("-confresp", M100Command.OptionType.NONE, Options.CONFIGURE_RESPONSE, "Send l2cap configuration response.");
 	}
 
 	~L2CAPCommand() {
@@ -64,7 +46,7 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 	}
 
 	public override int act_on(etxt*cmdstr, OutputStream pad) throws M100CommandError.ActionFailed {
-		SearchableSet<txt> vals = SearchableSet<txt>();
+		ArrayList<txt> vals = ArrayList<txt>();
 		if(parseOptions(cmdstr, &vals) != 0) {
 			throw new M100CommandError.ActionFailed.INVALID_ARGUMENT("Invalid argument");
 		}
@@ -73,45 +55,43 @@ public class hciplus.L2CAPCommand : shotodol.M100Command {
 		int l2type = 2;
 		int l2capConnectionToken = 0;
 		int cmdId = 0;
-		container<txt>? mod;
-		if((mod = vals.search(Options.ACL_HANDLE, match_all)) == null) {
+		txt? arg;
+		if((arg = vals[Options.ACL_HANDLE]) == null) {
 			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
 		}
-		unowned txt ? arg = mod.get();
 		if(arg.is_empty_magical())
 			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
 		aclHandle = arg.to_int();
-		if((mod = vals.search(Options.L2CAP_CID, match_all)) == null) {
+		if((arg = vals[Options.L2CAP_CID]) == null) {
 			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
 		}
-		arg = mod.get();
 		if(arg.is_empty_magical())
 			throw new M100CommandError.ActionFailed.INSUFFICIENT_ARGUMENT("Insufficient argument");
 		l2capHandle = arg.to_int();
-		if((mod = vals.search(Options.L2CAP_TYPE, match_all)) != null) {
-			l2type = mod.get().to_int();
+		if((arg = vals[Options.L2CAP_TYPE]) != null) {
+			l2type = arg.to_int();
 		}
-		if((mod = vals.search(Options.L2CAP_COMMAND_IDENTIFIER, match_all)) != null) {
-			cmdId = mod.get().to_int();
+		if((arg = vals[Options.L2CAP_COMMAND_IDENTIFIER]) != null) {
+			cmdId = arg.to_int();
 		}
-		if((mod = vals.search(Options.L2CAP_CONNECTION_TOKEN, match_all)) != null) {
-			l2capConnectionToken = mod.get().to_int();
+		if((arg = vals[Options.L2CAP_CONNECTION_TOKEN]) != null) {
+			l2capConnectionToken = arg.to_int();
 		}
-		if((mod = vals.search(Options.CONNECT, match_all)) != null) {
+		if((arg = vals[Options.CONNECT]) != null) {
 			int proto = 1; // SDP
-			proto = mod.get().to_int();
+			proto = arg.to_int();
 			spkr.connectL2CAP((uchar)l2type, aclHandle, l2capHandle, proto);
 			return 0;
 		}
-		if((mod = vals.search(Options.ACCEPT, match_all)) != null) {
+		if(vals[Options.ACCEPT] != null) {
 			spkr.acceptL2CAP(aclHandle, l2capHandle, (aroop_uword8)cmdId, l2capConnectionToken);
 			return 0;
 		}
-		if((mod = vals.search(Options.CONFIGURE_REQUEST, match_all)) != null) {
+		if(vals[Options.CONFIGURE_REQUEST] != null) {
 			spkr.sendL2CAPConfigureRequest(aclHandle, l2capHandle, l2capConnectionToken);
 			return 0;
 		}
-		if((mod = vals.search(Options.CONFIGURE_RESPONSE, match_all)) != null) {
+		if(vals[Options.CONFIGURE_RESPONSE] != null) {
 			spkr.sendL2CAPConfigureResponse(aclHandle, l2capHandle, l2capConnectionToken, (aroop_uword8)cmdId);
 			return 0;
 		}
