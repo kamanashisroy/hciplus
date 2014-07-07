@@ -13,7 +13,7 @@ public class hciplus.HCIRuleSet : hciplus.HCIScribe {
 		ProgrammingInstruction cp = new ProgrammingInstruction();
 		cp.register(cmds);
 		stdo = new shotodol.StandardOutputStream();
-		etxt rls = etxt.from_static("./hci_kit_ruleset.mk");
+		etxt rls = etxt.from_static("./hciplus.ske");
 		loadRules(&rls);
 	}
 	~HCIRuleSet() {
@@ -57,8 +57,6 @@ public class hciplus.HCIRuleSet : hciplus.HCIScribe {
 			if(cmd == null) {
 				break;
 			}
-			//dlg.printf("command:%s\n", cmd.to_string());
-			//shotodol.Watchdog.watchit(core.sourceFileName(), core.sourceLineNo(),10,0,0,0,&dlg);
 			// execute command
 			cmds.act_on(cmd, stdo, script);
 		}

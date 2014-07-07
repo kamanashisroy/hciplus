@@ -3,15 +3,16 @@ onHciSetup:
 	echo Hci is Up
 	hcikit -reset
 	hcikit -inquiry
-	set -var aclNotConnected -val 1
+	set -var aclConnected -val 1
+	echo aclConnected = $(aclConnected)
 	set -var incomingACL -val 0
 
 onNewDevice:
 	echo New device [$(newDeviceID)] $(newDevice)
-	if $(aclNotConnected) 
-		echo connecting
+	if ! $(aclConnected) 
+		echo connecting to $(newDeviceID)
 		acl -devid $(newDeviceID)
-		set -var aclNotConnected -val 0
+		set -var aclConnected -val 1
 
 onACLConnectRequest:
 	echo New incomming connection from $(devID)
